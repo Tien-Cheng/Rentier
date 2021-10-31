@@ -1,6 +1,15 @@
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,linux,flask,jupyternotebooks
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,linux,flask,jupyternotebooks
+### Databases ###
+*.sql
+*.db
+
+### Other ###
+*.tar.gz
+*.zip
+*.vscode
+secrets.txt
 
 ### Flask ###
 instance/*
