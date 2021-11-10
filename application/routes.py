@@ -1,3 +1,4 @@
+from werkzeug.utils import redirect
 from application import app
 from flask import render_template, request, flash
 from application.forms import Prediction, Login, Register
@@ -11,7 +12,7 @@ def predict_page():
     show_result = False
     if request.method == "POST":
         if pred_form.validate_on_submit():
-            flash(f"Prediction:", "<WIP>")
+            flash(f"Prediction:", "primary")
             show_result = True
         else:
             flash(f"Prediction failed", "danger")
@@ -20,9 +21,21 @@ def predict_page():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     loginForm = Login()
+    if request.method == "POST":
+        if loginForm.validate_on_submit():
+            flash(f"Logged In", "success")
+            redirect("/")
+        else:
+            flash(f"Failed to Log In", "danger")
     return render_template("login.html", form=loginForm,title="Rentier | Login")
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
     registerForm = Register()
+    if request.method == "POST":
+        if registerForm.validate_on_submit():
+            flash(f"Account Registered. Please Log In.", "success")
+            redirect("/login")
+        else:
+            flash("Failed to register account.", "danger")
     return render_template("register.html", form=registerForm, title="Rentier | Sign Up")
