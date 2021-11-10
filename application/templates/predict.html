@@ -1,16 +1,16 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="px-5 mt-5 mb-3 col-lg-7 col-sm-12">
-        <h1 class="display-5 fw-bold text-left">
-            Make a prediction
-        </h1>
-        <p>
-            Simply type down the details of the listing in question, and our AI model will make a prediction for you!
-        </p>
-    </div>
+
+<div class="px-5 pb-4">
+    <h1 class="display-5 fw-bold text-left">
+        Make a prediction
+    </h1>
+    <p class="lead">
+        Simply type down the details of the listing in question, and our AI model will make a prediction for you!
+    </p>
 </div>
+
 <div class="row">
     <div class="px-5 {% if results %} col-lg-6 col-sm-12 {% else %} col-12 {%endif %}">
         <div class="card">
@@ -89,24 +89,29 @@
     <div class="py-5 px-5 {%if results %} col-lg-6 col-sm-12 {%else%} d-none {%endif%}">
         <div class="card">
             <div class="card-body">
-               <h5 class="card-title">The predicted rental fee is...</h5>
-               <p class="card-text text-center">${{price}} per night
-               {% if actual_price %}
-                    which is ${{actual_price - price}} 
-                    {% if actual_price < price %}
-                        more
-                    {% elif price > actual_price %}
+                <h5 class="card-title fw-bold">The predicted rental fee is...</h5>
+                <p class="card-text text-center fs-5">${{price}} per night
+                    {% if actual_price %}
+                    which is ${{actual_price - price}}
+                    {% if actual_price < price %} more {% elif price> actual_price %}
                         less
-                    {% else %}
+                        {% else %}
                         the same
-                    {% endif %} 
-                    than the listing price
-               {% endif %}
-               </p>
-               <a href="#explain" class="card-link">Why?</a>
-               <a href="/history" class="card-link">See history</a>
+                        {% endif %}
+                        than the listing price
+                        {% endif %}
+                </p>
+                <a href="#explain" class="card-link">Why?</a>
+                <a href="/history" class="card-link">See history</a>
             </div>
         </div>
     </div>
+</div>
+<hr class="my-5">
+<div class="px-5 row my-5" id="explain">
+    <h2 class="display-6 fw-bold text-left">Prediction Report</h2>
+    <p class="lead">
+        Want to know how the model predicted the price? See our breakdown below...
+    </p>
 </div>
 {% endblock %}
