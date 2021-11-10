@@ -1,12 +1,12 @@
 from application import app
-from flask import render_template, request, flash, redirect, abort
+from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 @app.route('/', methods=["GET"])
-def index_page():
+def index():
     return render_template("index.html", title="Rentier")
 
 @app.route('/predict', methods=["GET", "POST"])
-def predict_page():
+def predict():
     pred_form = Prediction()
     show_result = False
     if request.method == "POST":
@@ -23,7 +23,7 @@ def login():
     if request.method == "POST":
         if loginForm.validate_on_submit():
             flash(f"Logged In", "success")
-            return redirect("/")
+            return redirect(url_for("index"))
         else:
             flash(f"Failed to Log In", "danger")
     return render_template("login.html", form=loginForm,title="Rentier | Login")
@@ -34,7 +34,7 @@ def register():
     if request.method == "POST":
         if registerForm.validate_on_submit():
             flash(f"Account Registered. Please Log In.", "success")
-            return redirect("/login")
+            return redirect(url_for("login"))
         else:
             flash("Failed to register account.", "danger")
 
