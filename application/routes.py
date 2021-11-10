@@ -27,6 +27,7 @@ def predict():
         results=show_result,
     )
 
+
 @app.route("/history", methods=["GET"])
 def history():
     raise NotImplementedError
@@ -61,7 +62,7 @@ def register():
     )
 
 
-@app.route("/logout", methods=["POST"])
+@app.route("/logout", methods=["GET", "POST"])
 def logout():
     # remove user from session
     session.pop("user_id", None)
