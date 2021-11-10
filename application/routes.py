@@ -2,7 +2,7 @@ from application import app
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
-from utils import login_required
+from application.utils import login_required
 
 
 @app.route("/", methods=["GET"])
@@ -34,6 +34,7 @@ def login():
     if request.method == "POST":
         if loginForm.validate_on_submit():
             # Check that password is correct and that user matches
+            # NOT IMPLEMENTED YET
             flash(f"Logged In", "success")
             return redirect(url_for("index"))
         else:
