@@ -8,22 +8,25 @@
         <div class="collapse navbar-collapse" id="navbarText">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link {% if url_for(request.endpoint) == url_for('index') %} active {% endif %}" href="/">Home</a>
+                    <a class="nav-link {% if url_for(request.endpoint) == url_for('index') %} active {% endif %}"
+                        href="/">Home</a>
                 </li>
                 {% if session.user_id %}
                 <li class="nav-item">
-                    <a class="nav-link {% if url_for(request.endpoint) == url_for('predict') %} active {% endif %}" href="/predict">Predict</a>
+                    <a class="nav-link {% if url_for(request.endpoint) == url_for('predict') %} active {% endif %}"
+                        href="/predict">Predict</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if url_for(request.endpoint) == url_for('history') %} active {% endif %}" href="/history">History</a>
+                    <a class="nav-link {% if url_for(request.endpoint) == url_for('history') %} active {% endif %}"
+                        href="/history">History</a>
                 </li>
                 {% endif %}
             </ul>
             <a class="btn btn-primary" href="{% if session.user_id %}/logout{%else %}/login{%endif %}">
                 {%if session.user_id %}
-                    Logout
+                Logout
                 {%else %}
-                    Login/Register
+                Login/Register
                 {% endif %}
             </a>
         </div>
