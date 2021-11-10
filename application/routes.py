@@ -1,11 +1,16 @@
 from application import app
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
-@app.route('/', methods=["GET"])
+from werkzeug.security import check_password_hash, generate_password_hash
+from utils import login_required
+
+
+@app.route("/", methods=["GET"])
 def index():
     return render_template("index.html", title="Rentier")
 
-@app.route('/predict', methods=["GET", "POST"])
+
+@app.route("/predict", methods=["GET", "POST"])
 def predict():
     pred_form = Prediction()
     show_result = False
@@ -15,9 +20,15 @@ def predict():
             show_result = True
         else:
             flash(f"Prediction failed", "danger")
-    return render_template("predict.html", form=pred_form, title="Rentier | Make a Prediction", results=show_result)
+    return render_template(
+        "predict.html",
+        form=pred_form,
+        title="Rentier | Make a Prediction",
+        results=show_result,
+    )
 
-@app.route('/login', methods=["GET", "POST"])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
     loginForm = Login()
     if request.method == "POST":
@@ -27,9 +38,10 @@ def login():
             return redirect(url_for("index"))
         else:
             flash(f"Failed to Log In", "danger")
-    return render_template("login.html", form=loginForm,title="Rentier | Login")
+    return render_template("login.html", form=loginForm, title="Rentier | Login")
 
-@app.route('/register', methods=["GET", "POST"])
+
+@app.route("/register", methods=["GET", "POST"])
 def register():
     registerForm = Register()
     if request.method == "POST":
@@ -39,13 +51,14 @@ def register():
         else:
             flash("Failed to register account.", "danger")
 
-    return render_template("register.html", form=registerForm, title="Rentier | Sign Up")
+    return render_template(
+        "register.html", form=registerForm, title="Rentier | Sign Up"
+    )
 
 
-@app.route('/logout', methods=["POST"])
+@app.route("/logout", methods=["POST"])
 def logout():
     # remove user from session
-    session.pop('user_id', None)
+    session.pop("user_id", None)
     flash("Logged Out", "warning")
     return redirect(url_for("index"))
-
