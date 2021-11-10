@@ -22,6 +22,7 @@ def login():
     loginForm = Login()
     if request.method == "POST":
         if loginForm.validate_on_submit():
+            # Check that password is correct and that user matches
             flash(f"Logged In", "success")
             return redirect(url_for("index"))
         else:
@@ -39,3 +40,12 @@ def register():
             flash("Failed to register account.", "danger")
 
     return render_template("register.html", form=registerForm, title="Rentier | Sign Up")
+
+
+@app.route('/logout', methods=["POST"])
+def logout():
+    # remove user from session
+    session.pop('user_id', None)
+    flash("Logged Out", "warning")
+    return redirect(url_for("index"))
+
