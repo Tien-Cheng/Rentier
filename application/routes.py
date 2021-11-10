@@ -27,6 +27,10 @@ def predict():
         results=show_result,
     )
 
+@app.route("/history", methods=["GET"])
+def history():
+    raise NotImplementedError
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
