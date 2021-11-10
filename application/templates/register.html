@@ -5,11 +5,13 @@
 
 <form class="col-lg-6 col-sm-12 mx-auto" name="loginForm" method="POST" action="/login" novalidate>
     <h1>Sign Up</h1>
+    {{ form.hidden_tag() }}
     <div class="mb-3">
         {{ form.email.label(class_='form-label') }}
         {{ form.email(class_='form-control')}}
         <span class="form-text">We'll never share your email with anyone else.</span>
         {% for error in form.email.errors %}
+        <br>
         <span class="text-danger">{{ error }}</span>
         {% endfor %}
     </div>
@@ -21,7 +23,7 @@
         {% endfor %}
     </div>
     <div class="mb-3">
-            {{ form.submit(class_='btn btn-success') }}
+        {{ form.submit(class_='btn btn-success') }}
     </div>
 </form>
 <p class="text-center">
