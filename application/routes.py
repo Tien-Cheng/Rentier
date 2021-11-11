@@ -1,10 +1,10 @@
 from application import app, db
-from application.models import User
+from application.models import User, add_user
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
 from application.utils import login_required
-
+from datetime import datetime
 # Create database if does not exist
 db.create_all()
 
@@ -55,10 +55,20 @@ def login():
 def register():
     registerForm = Register()
     if request.method == "POST":
-        if registerForm.validate_on_submit():
+        try:
+            if not registerForm.validate_on_submit():
+                raise Exception
+            email = registerForm.email.data
+            password_hash = generate_password_hash(registerForm.password.data)
+            new_user = User(
+                email=email,
+                password_hash=password_hash,
+                created = datetime.utcnow()
+            )
+            add_user(new_user)
             flash(f"Account Registered. Please Log In.", "success")
             return redirect(url_for("login"))
-        else:
+        except:
             flash("Failed to register account.", "danger")
 
     return render_template(
