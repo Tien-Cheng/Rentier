@@ -107,6 +107,7 @@
         </div>
     </div>
 </div>
+{% if results %}
 <hr class="my-5">
 <div class="px-5 row my-5" id="explain">
     <h2 class="display-6 fw-bold text-left">Prediction Report</h2>
@@ -114,4 +115,5 @@
         Want to know how the model predicted the price? See our breakdown below...
     </p>
 </div>
+{% endif %}
 {% endblock %}
