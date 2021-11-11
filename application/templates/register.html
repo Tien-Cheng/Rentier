@@ -23,6 +23,13 @@
         {% endfor %}
     </div>
     <div class="mb-3">
+        {{ form.confirm.label(class_='form-label') }}
+        {{ form.confirm.(class_='form-control')}}
+        {% for error in form.confirm.errors %}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+    </div>
+    <div class="mb-3">
         {{ form.submit(class_='btn btn-success') }}
     </div>
 </form>

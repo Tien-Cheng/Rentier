@@ -7,12 +7,12 @@ from wtforms.fields.html5 import URLField, IntegerField, DecimalField, EmailFiel
 from wtforms.validators import (
     Length,
     InputRequired,
-    ValidationError,
     NumberRange,
     Optional,
     URL,
     Email,
     Regexp,
+    EqualTo
 )
 
 password_validator = Regexp(
@@ -126,7 +126,9 @@ class Register(FlaskForm):
     email = EmailField("Email address", validators=[InputRequired(), Email()])
 
     password = PasswordField(
-        "Password", validators=[InputRequired(), Length(min=8), password_validator]
+        "Password", validators=[InputRequired(), Length(min=8), password_validator, EqualTo("confirm", "Passwords must match")]
     )
+
+    confirm = PasswordField("Confirm password")
 
     submit = SubmitField("Submit")
