@@ -30,7 +30,7 @@ def predict():
 
 @app.route("/history", methods=["GET"])
 def history():
-    raise NotImplementedError
+    return render_template("history.html", title="Rentier | History")
 
 
 @app.route("/login", methods=["GET", "POST"])
