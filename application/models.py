@@ -34,3 +34,5 @@ def add_user(new_user):
         db.session.rollback()
         flash(str(error), "danger")
         raise Exception
+
+

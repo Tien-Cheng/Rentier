@@ -113,11 +113,10 @@ class Login(FlaskForm):
         "Password",
         validators=[
             InputRequired(),
-            password_validator,
         ],
     )
 
-    remember_me = BooleanField("Remember me?", default=False)
+    remember_me = BooleanField("Remember me?", validators=[Optional()],default=False)
 
     submit = SubmitField("Submit")
 

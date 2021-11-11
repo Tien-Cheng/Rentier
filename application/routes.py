@@ -15,6 +15,7 @@ def index():
 
 
 @app.route("/predict", methods=["GET", "POST"])
+@login_required
 def predict():
     pred_form = Prediction()
     show_result = False
@@ -41,12 +42,24 @@ def history():
 def login():
     loginForm = Login()
     if request.method == "POST":
-        if loginForm.validate_on_submit():
-            # Check that password is correct and that user matches
-            # NOT IMPLEMENTED YET
+        try:
+            if not loginForm.validate_on_submit():
+                raise Exception
+                # Check that password is correct and that user matches
+                # NOT IMPLEMENTED YET
+            email = loginForm.email.data
+            password = loginForm.password.data
+            rows = db.session.query(User).filter_by(email = email).all()
+            if len(rows) == 0:
+                flash("User does not exist", "danger")
+                raise Exception
+            if not check_password_hash(rows[0].password_hash, password):
+                flash("Password is incorrect!", "danger")
+                raise Exception
+            session["user_id"] = rows[0].id
             flash(f"Logged In", "success")
             return redirect(url_for("index"))
-        else:
+        except:
             flash(f"Failed to Log In", "danger")
     return render_template("login.html", form=loginForm, title="Rentier | Login")
 
