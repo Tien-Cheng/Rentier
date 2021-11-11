@@ -26,7 +26,7 @@ class Prediction(FlaskForm):
         "Number of Bedrooms", validators=[InputRequired(), NumberRange(min=0)]
     )
 
-    bathrooms = IntegerField(
+    bathrooms = DecimalField(
         "Number of Bathrooms", validators=[InputRequired(), NumberRange(min=0)]
     )
 
