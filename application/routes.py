@@ -1,8 +1,12 @@
-from application import app
+from application import app, db
+from application.models import User
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
 from application.utils import login_required
+
+# Create database if does not exist
+db.create_all()
 
 
 @app.route("/", methods=["GET"])
