@@ -46,8 +46,6 @@ def login():
         try:
             if not loginForm.validate_on_submit():
                 raise Exception
-                # Check that password is correct and that user matches
-                # NOT IMPLEMENTED YET
             email = loginForm.email.data
             password = loginForm.password.data
             remember = loginForm.remember_me.data
@@ -64,7 +62,7 @@ def login():
                 session.permanent = True
             else:
                 session.permanent = False
-            if 'next' in session:
+            if 'next' in session: # redirect user back to original url if there was one
                 url = session['next']
                 return redirect(url)
             return redirect(url_for("index"))
