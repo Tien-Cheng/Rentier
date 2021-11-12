@@ -11,7 +11,7 @@
                     <a class="nav-link {% if url_for(request.endpoint) == url_for('index') %} active {% endif %}"
                         href="/">Home</a>
                 </li>
-                {% if session.user_id %}
+                {% if session.logged_in %}
                 <li class="nav-item">
                     <a class="nav-link {% if url_for(request.endpoint) == url_for('predict') %} active {% endif %}"
                         href="/predict">Predict</a>
@@ -22,13 +22,13 @@
                 </li>
                 {% endif %}
             </ul>
-            <a class="btn btn-primary" href="{% if session.user_id %}/logout{%else %}/login{%endif %}">
-                {%if session.user_id %}
-                Logout
-                {%else %}
-                Login/Register
-                {% endif %}
-            </a>
+            {% if session.logged_in %}
+            <form method="POST" action="/logout">
+                <input type="submit" class="btn btn-primary" value="Logout">
+            </form>
+            {% else %}
+            <a class="btn btn-primary" href="/login">Login</a>
+            {% endif %}
         </div>
     </div>
 </nav>

@@ -56,7 +56,7 @@ def login():
             if not check_password_hash(rows[0].password_hash, password):
                 flash("Password is incorrect!", "danger")
                 raise Exception
-            session["user_id"] = rows[0].id
+            session["logged_in"] = True
             flash(f"Logged In", "success")
             return redirect(url_for("index"))
         except:
@@ -92,6 +92,6 @@ def register():
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
     # remove user from session
-    session.pop("user_id", None)
+    session.pop("logged_in", None)
     flash("Logged Out", "warning")
     return redirect(url_for("index"))
