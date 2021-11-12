@@ -59,6 +59,9 @@ def login():
                 raise Exception
             session["logged_in"] = True
             flash(f"Logged In", "success")
+            if 'next' in session:
+                url = session['next']
+                return redirect(url)
             return redirect(url_for("index"))
         except:
             flash(f"Failed to Log In", "danger")
