@@ -50,6 +50,7 @@ def login():
                 # NOT IMPLEMENTED YET
             email = loginForm.email.data
             password = loginForm.password.data
+            remember = loginForm.remember_me.data
             rows = db.session.query(User).filter_by(email = email).all()
             if len(rows) == 0:
                 flash("User does not exist", "danger")
@@ -59,6 +60,10 @@ def login():
                 raise Exception
             session["logged_in"] = True
             flash(f"Logged In", "success")
+            if remember:
+                session.permanent = True
+            else:
+                session.permanent = False
             if 'next' in session:
                 url = session['next']
                 return redirect(url)
