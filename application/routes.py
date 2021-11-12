@@ -34,6 +34,7 @@ def predict():
 
 
 @app.route("/history", methods=["GET"])
+@login_required
 def history():
     return render_template("history.html", title="Rentier | History")
 
@@ -89,7 +90,8 @@ def register():
     )
 
 
-@app.route("/logout", methods=["GET", "POST"])
+@app.route("/logout", methods=["POST"])
+@login_required
 def logout():
     # remove user from session
     session.pop("logged_in", None)
