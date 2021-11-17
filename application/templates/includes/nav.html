@@ -22,13 +22,13 @@
                 </li>
                 {% endif %}
             </ul>
-            <a class="btn btn-primary" href="{% if session.user_id %}/logout{%else %}/login{%endif %}">
-                {%if session.user_id %}
-                Logout
-                {%else %}
-                Login/Register
-                {% endif %}
-            </a>
+            {% if session.user_id %}
+            <form method="POST" action="/logout">
+                <input type="submit" class="btn btn-primary" value="Logout">
+            </form>
+            {% else %}
+            <a class="btn btn-primary" href="/login">Login</a>
+            {% endif %}
         </div>
     </div>
 </nav>

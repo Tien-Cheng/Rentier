@@ -3,7 +3,7 @@
 {% block content %}
 
 
-<form class="col-lg-6 col-sm-12 mx-auto" name="signupForm" method="POST" action="/register" novalidate>
+<form class="col-lg-4 col-sm-12 mx-auto" name="signupForm" method="POST" action="/register" novalidate>
     <h1>Sign Up</h1>
     {{ form.hidden_tag() }}
     <div class="mb-3">
@@ -19,6 +19,13 @@
         {{ form.password.label(class_='form-label') }}
         {{ form.password(class_='form-control')}}
         {% for error in form.password.errors %}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+    </div>
+    <div class="mb-3">
+        {{ form.confirm.label(class_='form-label') }}
+        {{ form.confirm(class_='form-control')}}
+        {% for error in form.confirm.errors %}
         <span class="text-danger">{{ error }}</span>
         {% endfor %}
     </div>

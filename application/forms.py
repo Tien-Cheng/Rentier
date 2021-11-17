@@ -1,5 +1,4 @@
 from flask_wtf import FlaskForm
-from flask_wtf.recaptcha import validators
 
 from wtforms import BooleanField, SelectField, SubmitField, PasswordField
 
@@ -7,12 +6,12 @@ from wtforms.fields.html5 import URLField, IntegerField, DecimalField, EmailFiel
 from wtforms.validators import (
     Length,
     InputRequired,
-    ValidationError,
     NumberRange,
     Optional,
     URL,
     Email,
     Regexp,
+    EqualTo
 )
 
 password_validator = Regexp(
@@ -113,11 +112,10 @@ class Login(FlaskForm):
         "Password",
         validators=[
             InputRequired(),
-            password_validator,
         ],
     )
 
-    remember_me = BooleanField("Remember me?", default=False)
+    remember_me = BooleanField("Remember me?", validators=[Optional()],default=False)
 
     submit = SubmitField("Submit")
 
@@ -126,7 +124,9 @@ class Register(FlaskForm):
     email = EmailField("Email address", validators=[InputRequired(), Email()])
 
     password = PasswordField(
-        "Password", validators=[InputRequired(), Length(min=8), password_validator]
+        "Password", validators=[InputRequired(), Length(min=8), password_validator, EqualTo("confirm", "Passwords must match")]
     )
+
+    confirm = PasswordField("Confirm password")
 
     submit = SubmitField("Submit")
