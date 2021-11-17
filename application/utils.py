@@ -7,7 +7,7 @@ def login_required(func):
 
     @wraps(func)
     def decorated_func(*args, **kwargs):
-        if session.get("logged_in") is None:  # Check if user is logged in
+        if session.get("user_id") is None:  # Check if user is logged in
             flash("Please login first!", "warning")
             session["next"] = request.url
             return redirect(url_for("login"))

@@ -56,7 +56,7 @@ def login():
             if not check_password_hash(rows[0].password_hash, password):
                 flash("Password is incorrect!", "danger")
                 raise Exception
-            session["logged_in"] = True
+            session["user_id"] = rows[0].id
             flash(f"Logged In", "success")
             if remember:
                 session.permanent = True
