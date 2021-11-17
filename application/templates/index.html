@@ -12,8 +12,12 @@
             AirBNB listing.
         </p>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-left">
+            {% if session.user_id %}
+            <a href="/predict" class="btn btn-primary btn-lg">Get Started</a>
+            {% else %}
             <a href="/register" class="btn btn-success btn-lg px-4 gap-3">Register</a>
             <a href="/login" class="btn btn-primary btn-lg px-4">Login</a>
+            {% endif %}
         </div>
     </div>
     <figure class="px-4 py-5 my-5 col-lg-5  d-sm-none d-lg-block">
