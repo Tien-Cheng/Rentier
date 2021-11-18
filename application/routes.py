@@ -1,10 +1,11 @@
-from application import app, db
+from application import app, db, ai_model
 from application.models import User, add_user
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
-from application.utils import login_required
+from application.utils import login_required, ToDataFrame
 from datetime import datetime
+import pandas as pd
 # Create database if does not exist
 db.create_all()
 
@@ -21,7 +22,29 @@ def predict():
     show_result = False
     if request.method == "POST":
         if pred_form.validate_on_submit():
-            flash(f"Prediction:", "primary")
+            bedrooms = pred_form.bedrooms.data
+            bathrooms = pred_form.bathrooms.data
+            accomodates = pred_form.accomodates.data
+            room_type = pred_form.room_type.data
+            neighborhood = pred_form.neighborhood.data
+            elevator = pred_form.elevator.data
+            pool = pred_form.pool.data
+            actual_price = pred_form.actual_price.data
+            link = pred_form.link.data
+            entry_params = pd.DataFrame(
+                {
+                    "bedrooms": [bedrooms],
+                    "bathrooms_cleaned" : [bathrooms],
+                    "accommodates" : [accomodates],
+                    "room_type" : [room_type],
+                    "neighbourhood_cleansed" : [neighborhood],
+                    "elevator" : [elevator],
+                    "pool" : [pool],
+                }
+            )
+            print(entry_params)
+            result = ai_model.predict(entry_params)
+            flash(f"Prediction: {result[0]}", "primary")
             show_result = True
         else:
             flash(f"Prediction failed", "danger")
