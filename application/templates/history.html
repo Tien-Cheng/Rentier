@@ -3,29 +3,30 @@
 {% block content %}
 <div class="row">
     <h1 class="display-6 col-lg-3 col-sm-12 text-justify">Your History</h1>
-    <p class="lead col-lg-6 col-sm-12 text-justify">We keep track of your past submissions to help you make a comparison between different listings.</p>
+    <p class="lead col-lg-6 col-sm-12 text-justify">We keep track of your past submissions to help you make a comparison
+        between different listings.</p>
 </div>
+{% if history %}
 <div class="table-responsive my-3">
-<table class="table table-hover text-center">
-    <thead class="table-dark">
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Bedrooms</th>
-            <th scope="col">Bathrooms</th>
-            <th scope="col">Accomodates</th>
-            <th scope="col">Room Type</th>
-            <th scope="col">Neighborhood</th>
-            <th scope="col">Elevator?</th>
-            <th scope="col">Pool?</th>
-            <th scope="col">Predicted</th>
-            <th scope="col">Actual</th>
-            <th scope="col">Difference</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <!-- Placeholder to show what the table ought to look like-->
+    <table class="table table-hover text-center">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Bedrooms</th>
+                <th scope="col">Bathrooms</th>
+                <th scope="col">Accomodates</th>
+                <th scope="col">Room Type</th>
+                <th scope="col">Neighborhood</th>
+                <th scope="col">Elevator?</th>
+                <th scope="col">Pool?</th>
+                <th scope="col">Predicted</th>
+                <th scope="col">Actual</th>
+                <th scope="col">Difference</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- <tr>
             <td>Example Row</td>
             <td>1</td>
             <td>1</td>
@@ -38,24 +39,31 @@
             <td>$90</td>
             <td>-$10</td>
             <td>❌ &nbsp; 🔎</td>
-        </tr>
-        {% for entry in history %}
-        <tr>
-            <td>{{ entry.id }}</td>
-            <td>{{ entry.bedrooms }}</td>
-            <td>{{ entry.bathrooms }}</td>
-            <td>{{ entry.accomodates }}</td>
-            <td>{{ entry.room_type }}</td>
-            <td>{{ entry.neighborhood }}</td>
-            <td>{{ entry.elevator }}</td>
-            <td>{{ entry.pool }}</td>
-            <td>{{ entry.prediction }}</td>
-            <td>{% if entry.actual_price %} {{ entry.actual_price }} {% else %} N/A {% endif %}</td>
-            <td>{% if entry.actual_price %} {{ entry.actual_price - entry.prediction }} {% else %} N/A {% endif %}</td>
-            <td>WIP</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </tr> -->
+            {% for entry in history %}
+            <tr>
+                <td>{{ entry.id }}</td>
+                <td>{{ entry.bedrooms }}</td>
+                <td>{{ entry.bathrooms }}</td>
+                <td>{{ entry.accomodates }}</td>
+                <td>{{ entry.room_type }}</td>
+                <td>{{ entry.neighborhood }}</td>
+                <td>{{ entry.elevator }}</td>
+                <td>{{ entry.pool }}</td>
+                <td>{{ entry.prediction }}</td>
+                <td>{% if entry.actual_price %} {{ entry.actual_price }} {% else %} N/A {% endif %}</td>
+                <td>{% if entry.actual_price %} {{ entry.actual_price - entry.prediction }} {% else %} N/A {% endif %}
+                </td>
+                <td>WIP</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
+{% else %}
+<div class="my-5">
+    <p class="text-muted text-center h4">No past records found. Go <a href="/predict">make</a> some history!</p>
+</div>
+{% endif %}
+
 {% endblock %}
