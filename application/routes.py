@@ -147,6 +147,6 @@ def register():
 @login_required
 def logout():
     # remove user from session
-    session.pop("logged_in", None)
+    session.pop("user_id", None)
     flash("Logged Out", "warning")
     return redirect(url_for("index"))
