@@ -1,5 +1,5 @@
 from application import app, db, ai_model
-from application.models import User, add_user
+from application.models import User, add_user, Entry, add_entry
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -43,13 +43,31 @@ def predict():
                     "pool" : [pool],
                 }
             )
-            print(entry_params)
             result = ai_model.predict(entry_params)
             show_result = True
             results = {
                 "price" : result[0],
                 "actual_price" : actual_price
             }
+
+            new_entry = Entry(
+                bedrooms = bedrooms,
+                bathrooms = bathrooms,
+                accomodates = accomodates,
+                room_type = room_type,
+                neighborhood = neighborhood,
+                elevator = elevator,
+                pool = pool,
+                actual_price = actual_price,
+                link = link,
+                prediction = result[0],
+                created = datetime.utcnow(),
+                user_id = session["user_id"]
+            )
+            try:
+                add_entry(new_entry)
+            except Exception as error:
+                flash(f"Failed to add entry to history. Error: {error}", "danger")
         else:
             flash(f"Prediction failed", "danger")
     return render_template(
