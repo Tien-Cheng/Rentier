@@ -3,7 +3,7 @@ from application.models import User, add_user
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
-from application.utils import login_required, ToDataFrame
+from application.utils import login_required
 from datetime import datetime
 import pandas as pd
 # Create database if does not exist
@@ -20,6 +20,7 @@ def index():
 def predict():
     pred_form = Prediction()
     show_result = False
+    results = {}
     if request.method == "POST":
         if pred_form.validate_on_submit():
             bedrooms = pred_form.bedrooms.data
@@ -30,7 +31,7 @@ def predict():
             elevator = pred_form.elevator.data
             pool = pred_form.pool.data
             actual_price = pred_form.actual_price.data
-            link = pred_form.link.data
+            link = pred_form.link.data # store link for history
             entry_params = pd.DataFrame(
                 {
                     "bedrooms": [bedrooms],
@@ -44,8 +45,11 @@ def predict():
             )
             print(entry_params)
             result = ai_model.predict(entry_params)
-            flash(f"Prediction: {result[0]}", "primary")
             show_result = True
+            results = {
+                "price" : result[0],
+                "actual_price" : float(actual_price)
+            }
         else:
             flash(f"Prediction failed", "danger")
     return render_template(
@@ -53,6 +57,7 @@ def predict():
         form=pred_form,
         title="Rentier | Make a Prediction",
         results=show_result,
+        **results
     )
 
 
