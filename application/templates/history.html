@@ -26,7 +26,7 @@
     <tbody>
         <tr>
             <!-- Placeholder to show what the table ought to look like-->
-            <td>1</td>
+            <td>Example Row</td>
             <td>1</td>
             <td>1</td>
             <td>2</td>
@@ -39,6 +39,22 @@
             <td>-$10</td>
             <td>❌ &nbsp; 🔎</td>
         </tr>
+        {% for entry in history %}
+        <tr>
+            <td>{{ entry.id }}</td>
+            <td>{{ entry.bedrooms }}</td>
+            <td>{{ entry.bathrooms }}</td>
+            <td>{{ entry.accomodates }}</td>
+            <td>{{ entry.room_type }}</td>
+            <td>{{ entry.neighborhood }}</td>
+            <td>{{ entry.elevator }}</td>
+            <td>{{ entry.pool }}</td>
+            <td>{{ entry.prediction }}</td>
+            <td>{% if entry.actual_price %} {{ entry.actual_price }} {% else %} N/A {% endif %}</td>
+            <td>{% if entry.actual_price %} {{ entry.actual_price - entry.prediction }} {% else %} N/A {% endif %}</td>
+            <td>WIP</td>
+        </tr>
+        {% endfor %}
     </tbody>
 </table>
 </div>

@@ -30,6 +30,12 @@ def add_entry(entry):
         flash(str(error), "danger")
         raise Exception        
 
+def get_history(user_id):
+    try:
+        return db.session.query(Entry).filter_by(user_id=user_id).all()
+    except Exception as error:
+        flash(str(error), "danger")
+        raise Exception
 class User(db.Model):
     __tablename__ = "users"
 

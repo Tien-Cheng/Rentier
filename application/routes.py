@@ -1,5 +1,5 @@
 from application import app, db, ai_model
-from application.models import User, add_user, Entry, add_entry
+from application.models import User, add_user, Entry, add_entry, get_history
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -82,7 +82,8 @@ def predict():
 @app.route("/history", methods=["GET"])
 @login_required
 def history():
-    return render_template("history.html", title="Rentier | History")
+    history = get_history(session["user_id"])
+    return render_template("history.html", title="Rentier | History", history=history)
 
 
 @app.route("/login", methods=["GET", "POST"])
