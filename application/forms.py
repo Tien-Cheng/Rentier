@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 
-from wtforms import BooleanField, SelectField, SubmitField, PasswordField
+from wtforms import BooleanField, SelectField, SubmitField, PasswordField, FloatField, IntegerField
 
-from wtforms.fields.html5 import URLField, IntegerField, DecimalField, EmailField
+from wtforms.fields.html5 import URLField, EmailField
 from wtforms.validators import (
     Length,
     InputRequired,
@@ -25,7 +25,7 @@ class Prediction(FlaskForm):
         "Number of Bedrooms", validators=[InputRequired(), NumberRange(min=0)]
     )
 
-    bathrooms = DecimalField(
+    bathrooms = FloatField(
         "Number of Bathrooms", validators=[InputRequired(), NumberRange(min=0)]
     )
 
@@ -96,7 +96,7 @@ class Prediction(FlaskForm):
 
     pool = BooleanField("Pool?", default=False)
 
-    actual_price = DecimalField(
+    actual_price = FloatField(
         "Actual Listing Price (Optional)", validators=[Optional(), NumberRange(min=0)]
     )
 
