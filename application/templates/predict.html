@@ -90,9 +90,9 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title fw-bold">The predicted rental fee is...</h5>
-                <p class="card-text text-center fs-5">${{price | round(precision=2) }} per night
+                <p class="card-text text-center fs-5">${{price | default(0)|round(precision=2) }} per night
                     {% if actual_price %}
-                    which is ${{(actual_price - price) | abs | round(precision=2)}}
+                    which is ${{(actual_price - price)| default(0) | abs | round(precision=2)}}
                     {% if actual_price < price %} more {% elif price> actual_price %}
                         less
                         {% else %}

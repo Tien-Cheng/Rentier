@@ -48,7 +48,7 @@ def predict():
             show_result = True
             results = {
                 "price" : result[0],
-                "actual_price" : float(actual_price)
+                "actual_price" : actual_price
             }
         else:
             flash(f"Prediction failed", "danger")
