@@ -42,7 +42,7 @@
         </tr> -->
             {% for entry in history %}
             <tr>
-                <td>{{ entry.id }}</td>
+                <td>{{ loop.index }}</td>
                 <td>{{ entry.bedrooms }}</td>
                 <td>{{ entry.bathrooms }}</td>
                 <td>{{ entry.accomodates }}</td>
