@@ -1,10 +1,11 @@
-from application import app, db
-from application.models import User, add_user
+from application import app, db, ai_model
+from application.models import User, add_user, Entry, add_entry, get_history
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
 from application.utils import login_required
 from datetime import datetime
+import pandas as pd
 # Create database if does not exist
 db.create_all()
 
@@ -19,10 +20,64 @@ def index():
 def predict():
     pred_form = Prediction()
     show_result = False
+    results = {}
     if request.method == "POST":
         if pred_form.validate_on_submit():
-            flash(f"Prediction:", "primary")
+            beds = pred_form.beds.data
+            bathrooms = pred_form.bathrooms.data
+            accomodates = pred_form.accomodates.data
+            minimum_nights = pred_form.minimum_nights.data
+            room_type = pred_form.room_type.data
+            neighborhood = pred_form.neighborhood.data
+            wifi = pred_form.wifi.data
+            elevator = pred_form.elevator.data
+            pool = pred_form.pool.data
+            actual_price = pred_form.actual_price.data
+            link = pred_form.link.data # store link for history
+            entry_params = pd.DataFrame(
+                {
+                    "beds": [beds],
+                    "bathrooms_cleaned" : [bathrooms],
+                    "accommodates" : [accomodates],
+                    "minimum_nights" : [minimum_nights],
+                    "room_type" : [room_type],
+                    "neighbourhood_cleansed" : [neighborhood],
+                    "wifi" : [wifi],
+                    "elevator" : [elevator],
+                    "pool" : [pool],
+                }
+            )
+            result = ai_model.predict(entry_params)
             show_result = True
+            results = {
+                "price" : result[0],
+                "actual_price" : actual_price
+            }
+
+            if actual_price is not None:
+                results["price_diff"] = abs(actual_price - result[0])
+                results["same"] = results["price_diff"] < 0.05 # account for floating point inprecision
+
+            new_entry = Entry(
+                beds = beds,
+                bathrooms = bathrooms,
+                accomodates = accomodates,
+                minimum_nights = minimum_nights,
+                room_type = room_type,
+                neighborhood = neighborhood,
+                wifi = wifi,
+                elevator = elevator,
+                pool = pool,
+                actual_price = actual_price,
+                link = link,
+                prediction = result[0],
+                created = datetime.utcnow(),
+                user_id = session["user_id"]
+            )
+            try:
+                add_entry(new_entry)
+            except Exception as error:
+                flash(f"Failed to add entry to history. Error: {error}", "danger")
         else:
             flash(f"Prediction failed", "danger")
     return render_template(
@@ -30,13 +85,15 @@ def predict():
         form=pred_form,
         title="Rentier | Make a Prediction",
         results=show_result,
+        **results
     )
 
 
 @app.route("/history", methods=["GET"])
 @login_required
 def history():
-    return render_template("history.html", title="Rentier | History")
+    history = get_history(session["user_id"])
+    return render_template("history.html", title="Rentier | History", history=history)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -100,6 +157,6 @@ def register():
 @login_required
 def logout():
     # remove user from session
-    session.pop("logged_in", None)
+    session.pop("user_id", None)
     flash("Logged Out", "warning")
     return redirect(url_for("index"))

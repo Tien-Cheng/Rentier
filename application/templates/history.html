@@ -3,30 +3,33 @@
 {% block content %}
 <div class="row">
     <h1 class="display-6 col-lg-3 col-sm-12 text-justify">Your History</h1>
-    <p class="lead col-lg-6 col-sm-12 text-justify">We keep track of your past submissions to help you make a comparison between different listings.</p>
+    <p class="lead col-lg-6 col-sm-12 text-justify">We keep track of your past submissions to help you make a comparison
+        between different listings.</p>
 </div>
+{% if history %}
 <div class="table-responsive my-3">
-<table class="table table-hover text-center">
-    <thead class="table-dark">
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Bedrooms</th>
-            <th scope="col">Bathrooms</th>
-            <th scope="col">Accomodates</th>
-            <th scope="col">Room Type</th>
-            <th scope="col">Neighborhood</th>
-            <th scope="col">Elevator?</th>
-            <th scope="col">Pool?</th>
-            <th scope="col">Predicted</th>
-            <th scope="col">Actual</th>
-            <th scope="col">Difference</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <!-- Placeholder to show what the table ought to look like-->
-            <td>1</td>
+    <table class="table table-hover text-center">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Beds</th>
+                <th scope="col">Bathrooms</th>
+                <th scope="col">Accomodates</th>
+                <th scope="col">Minimum Nights</th>
+                <th scope="col">Room Type</th>
+                <th scope="col">Neighborhood</th>
+                <th scope="col">Wifi?</th>
+                <th scope="col">Elevator?</th>
+                <th scope="col">Pool?</th>
+                <th scope="col">Predicted</th>
+                <th scope="col">Actual</th>
+                <th scope="col">Difference</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- <tr>
+            <td>Example Row</td>
             <td>1</td>
             <td>1</td>
             <td>2</td>
@@ -38,8 +41,45 @@
             <td>$90</td>
             <td>-$10</td>
             <td>❌ &nbsp; 🔎</td>
-        </tr>
-    </tbody>
-</table>
+        </tr> -->
+            {% for entry in history %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ entry.beds }}</td>
+                <td>{{ entry.bathrooms }}</td>
+                <td>{{ entry.accomodates }}</td>
+                <td>{{ entry.minimum_nights }}</td>
+                <td>{{ entry.room_type }}</td>
+                <td>{{ entry.neighborhood }}</td>
+                <td>{{ entry.wifi }}</td>
+                <td>{{ entry.elevator }}</td>
+                <td>{{ entry.pool }}</td>
+                <td>${{ entry.prediction | round(precision=2) }}</td>
+                <td>{% if entry.actual_price %} ${{ entry.actual_price | round(precision=2) }} {% else %} N/A {% endif %}</td>
+                <td>{% if entry.actual_price %} ${{ (entry.actual_price - entry.prediction) | round(precision=2) }} {% else %} N/A {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group">
+                    <form name="remove_entry" action="/delete" method="POST" novalidate>
+                        <input type="hidden" name="id" value="{{ entry.id }}">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                    <a href="{{ entry.link }}" class="btn {% if not entry.link %}disabled btn-secondary {% else %}btn-primary{% endif %}">
+                        <i class="bi bi-info-circle"></i>
+                    </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
+{% else %}
+<div class="my-5">
+    <p class="text-muted text-center h4">No past records found. Go <a href="/predict">make</a> some history!</p>
+</div>
+{% endif %}
+
 {% endblock %}

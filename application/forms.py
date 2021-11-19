@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 
-from wtforms import BooleanField, SelectField, SubmitField, PasswordField
+from wtforms import BooleanField, SelectField, SubmitField, PasswordField, FloatField, IntegerField
 
-from wtforms.fields.html5 import URLField, IntegerField, DecimalField, EmailField
+from wtforms.fields.html5 import URLField, EmailField
 from wtforms.validators import (
     Length,
     InputRequired,
@@ -21,16 +21,20 @@ password_validator = Regexp(
 
 
 class Prediction(FlaskForm):
-    bedrooms = IntegerField(
-        "Number of Bedrooms", validators=[InputRequired(), NumberRange(min=0)]
+    beds = IntegerField(
+        "Number of Beds", validators=[InputRequired(), NumberRange(min=0)]
     )
 
-    bathrooms = DecimalField(
+    bathrooms = FloatField(
         "Number of Bathrooms", validators=[InputRequired(), NumberRange(min=0)]
     )
 
     accomodates = IntegerField(
         "Accomodates", validators=[InputRequired(), NumberRange(min=0)]
+    )
+
+    minimum_nights = IntegerField(
+        "Minimum Nights", validators=[InputRequired(), NumberRange(min=0)]
     )
 
     room_type = SelectField(
@@ -92,11 +96,12 @@ class Prediction(FlaskForm):
         ),
     )
 
+    wifi = BooleanField("Wifi", default=True)
     elevator = BooleanField("Elevator Access?", default=False)
 
     pool = BooleanField("Pool?", default=False)
 
-    actual_price = DecimalField(
+    actual_price = FloatField(
         "Actual Listing Price (Optional)", validators=[Optional(), NumberRange(min=0)]
     )
 
