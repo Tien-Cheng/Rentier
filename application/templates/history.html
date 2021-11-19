@@ -12,11 +12,13 @@
         <thead class="table-dark">
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Bedrooms</th>
+                <th scope="col">Beds</th>
                 <th scope="col">Bathrooms</th>
                 <th scope="col">Accomodates</th>
+                <th scope="col">Minimum Nights</th>
                 <th scope="col">Room Type</th>
                 <th scope="col">Neighborhood</th>
+                <th scope="col">Wifi?</th>
                 <th scope="col">Elevator?</th>
                 <th scope="col">Pool?</th>
                 <th scope="col">Predicted</th>
@@ -43,18 +45,32 @@
             {% for entry in history %}
             <tr>
                 <td>{{ loop.index }}</td>
-                <td>{{ entry.bedrooms }}</td>
+                <td>{{ entry.beds }}</td>
                 <td>{{ entry.bathrooms }}</td>
                 <td>{{ entry.accomodates }}</td>
+                <td>{{ entry.minimum_nights }}</td>
                 <td>{{ entry.room_type }}</td>
                 <td>{{ entry.neighborhood }}</td>
+                <td>{{ entry.wifi }}</td>
                 <td>{{ entry.elevator }}</td>
                 <td>{{ entry.pool }}</td>
-                <td>{{ entry.prediction }}</td>
-                <td>{% if entry.actual_price %} {{ entry.actual_price }} {% else %} N/A {% endif %}</td>
-                <td>{% if entry.actual_price %} {{ entry.actual_price - entry.prediction }} {% else %} N/A {% endif %}
+                <td>${{ entry.prediction | round(precision=2) }}</td>
+                <td>{% if entry.actual_price %} ${{ entry.actual_price | round(precision=2) }} {% else %} N/A {% endif %}</td>
+                <td>{% if entry.actual_price %} ${{ (entry.actual_price - entry.prediction) | round(precision=2) }} {% else %} N/A {% endif %}
                 </td>
-                <td>WIP</td>
+                <td>
+                    <div class="btn-group">
+                    <form name="remove_entry" action="/delete" method="POST" novalidate>
+                        <input type="hidden" name="id" value="{{ entry.id }}">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                    <a href="{{ entry.link }}" class="btn {% if not entry.link %}disabled btn-secondary {% else %}btn-primary{% endif %}">
+                        <i class="bi bi-info-circle"></i>
+                    </a>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

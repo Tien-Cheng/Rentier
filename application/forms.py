@@ -21,8 +21,8 @@ password_validator = Regexp(
 
 
 class Prediction(FlaskForm):
-    bedrooms = IntegerField(
-        "Number of Bedrooms", validators=[InputRequired(), NumberRange(min=0)]
+    beds = IntegerField(
+        "Number of Beds", validators=[InputRequired(), NumberRange(min=0)]
     )
 
     bathrooms = FloatField(
@@ -31,6 +31,10 @@ class Prediction(FlaskForm):
 
     accomodates = IntegerField(
         "Accomodates", validators=[InputRequired(), NumberRange(min=0)]
+    )
+
+    minimum_nights = IntegerField(
+        "Minimum Nights", validators=[InputRequired(), NumberRange(min=0)]
     )
 
     room_type = SelectField(
@@ -92,6 +96,7 @@ class Prediction(FlaskForm):
         ),
     )
 
+    wifi = BooleanField("Wifi", default=True)
     elevator = BooleanField("Elevator Access?", default=False)
 
     pool = BooleanField("Pool?", default=False)

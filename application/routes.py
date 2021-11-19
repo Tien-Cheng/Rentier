@@ -23,22 +23,26 @@ def predict():
     results = {}
     if request.method == "POST":
         if pred_form.validate_on_submit():
-            bedrooms = pred_form.bedrooms.data
+            beds = pred_form.beds.data
             bathrooms = pred_form.bathrooms.data
             accomodates = pred_form.accomodates.data
+            minimum_nights = pred_form.minimum_nights.data
             room_type = pred_form.room_type.data
             neighborhood = pred_form.neighborhood.data
+            wifi = pred_form.wifi.data
             elevator = pred_form.elevator.data
             pool = pred_form.pool.data
             actual_price = pred_form.actual_price.data
             link = pred_form.link.data # store link for history
             entry_params = pd.DataFrame(
                 {
-                    "bedrooms": [bedrooms],
+                    "beds": [beds],
                     "bathrooms_cleaned" : [bathrooms],
                     "accommodates" : [accomodates],
+                    "minimum_nights" : [minimum_nights],
                     "room_type" : [room_type],
                     "neighbourhood_cleansed" : [neighborhood],
+                    "wifi" : [wifi],
                     "elevator" : [elevator],
                     "pool" : [pool],
                 }
@@ -50,12 +54,18 @@ def predict():
                 "actual_price" : actual_price
             }
 
+            if actual_price is not None:
+                results["price_diff"] = abs(actual_price - result[0])
+                results["same"] = results["price_diff"] < 0.05 # account for floating point inprecision
+
             new_entry = Entry(
-                bedrooms = bedrooms,
+                beds = beds,
                 bathrooms = bathrooms,
                 accomodates = accomodates,
+                minimum_nights = minimum_nights,
                 room_type = room_type,
                 neighborhood = neighborhood,
+                wifi = wifi,
                 elevator = elevator,
                 pool = pool,
                 actual_price = actual_price,

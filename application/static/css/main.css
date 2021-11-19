@@ -9,3 +9,9 @@
     background-color: #6c39cc !important;
     border-color    : #6c39cc !important;
 }
+
+.icon_button {
+    background: none;
+    padding   : 0px;
+    border    : none;
+}
