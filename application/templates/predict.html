@@ -108,8 +108,8 @@
                     the same
                     {% else %}
                     {{ price_diff | round(precision=2) }}
-                    {% if actual_price < price %} more {% else %} less {% endif %} {% endif %} as the listing price. {% endif %}
-                        </p>
+                    {% if actual_price < price %} more {% else %} less {% endif %} {% endif %} as the listing price. {%
+                        endif %} </p>
                         <a href="#explain" class="card-link">Why?</a>
                         <a href="/history" class="card-link">See history</a>
             </div>
@@ -123,18 +123,37 @@
     <p class="lead">
         Want to know how the model predicted the price? See our breakdown below...
     </p>
-    <h3>How does the model take my features into account?</h3>
-    <div>
-        <!-- Model Interpreation Here-->
+    <div class="col-lg-4 order-1">
+        <h3>What features does the model care about?</h3>
+        <p class="lead">
+            Generally, the model views the following factors as being the most important: (in order)
+        </p>
+        <ol>
+            <li>Room Type</li>
+            <li>Number of People that can be Accomodated</li>
+            <li>The Mininum Number of Nights Visitors can Stay</li>
+            <li>Number of Bathrooms and Beds</li>
+            <li>Neighborhood</li>
+            <li>Ammenities</li>
+        </ol>
     </div>
+    <figure class="col-lg-8 order-2">
+        <!-- Model Interpreation Here-->
+        <img src="{{ url_for('static', filename='images/feature_importances.png')}}"
+            alt="Feature importances Plot of Model" class="img img-fluid">
+        <figcaption>Feature Importances Plot of the Model</figfigcaption>
+    </figure>
 </div>
 <div class="px-5 my-5 row">
-    <div class="col-lg-6">
+    <div class="col-lg-4 order-sm-1 order-lg-2">
         <h3>How accurate is the model?</h3>
-        <p class="lead">
-            
-        </p>
+        <p class="lead">The model has a mean absolute error of $36 (on an independent test set), meaning that we can expect the model to be off by around $36 on average. </p>
     </div>
+    <figure class="col-lg-8 order-sm-2 order-lg-2">
+        <img src="{{ url_for('static', filename='images/model_residual_plot.png')}}" alt="Residual Plot of Model"
+            class="img img-fluid">
+        <figcaption>Residual Plot of the Model. Residuals = Actual - Predicted</figfigcaption>
+    </figure>
 </div>
 {% endif %}
 {% endblock %}
