@@ -107,8 +107,8 @@
                     {% if same %}
                     the same
                     {% else %}
-                    {{ price_diff | round(precision=2) }}
-                    {% if actual_price < price %} more {% else %} less {% endif %} {% endif %} as the listing price. {%
+                    ${{ price_diff | round(precision=2) }}
+                    {% if actual_price < price %} more {% else %} less {% endif %} {% endif %} than the listing price. {%
                         endif %} </p>
                         <a href="#explain" class="card-link">Why?</a>
                         <a href="/history" class="card-link">See history</a>
