@@ -1,5 +1,6 @@
 from application import db
 import datetime as dt
+import re
 from flask import flash
 from sqlalchemy.orm import validates
 
@@ -93,6 +94,10 @@ class Entry(db.Model):
         assert prediction > 0, "Prediction should be positive"
         return prediction
 
+    @validates("created")
+    def validates_created(self, key, created):
+        assert type(created) is dt.datetime, "created should be a datetime object"
+        return created
     
 def add_entry(entry):
     try:
@@ -130,6 +135,24 @@ class User(db.Model):
 
     history = db.relationship("Entry", backref="user", lazy=True)
 
+    @validates("email")
+    def validate_email(self, email):
+        """
+        Validate email address. Email address should already have been validated by the Flask Form, but we double check the input here just in case
+        """
+        assert len(email) <= 255, "Email address should be at most 255 characters long."
+        assert re.search(r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$", email) is not None, "Email address is invalid"
+        return email
+
+    @validates("password_hash")
+    def validate_hash(self, key, password_hash):
+        assert len(password_hash) == 64, "Password hash should be 64 characters long."
+        return password_hash
+
+    @validates("created")
+    def validates_created(self, key, created):
+        assert type(created) is dt.datetime, "created should be a datetime object"
+        return created
 
 def add_user(new_user):
     try:
