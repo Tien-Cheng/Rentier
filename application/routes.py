@@ -11,13 +11,15 @@ db.create_all()
 
 
 @app.route("/", methods=["GET"])
-def index():
+def index(): 
+    """ This function serves as a view of the web server . It is used to render the index template for the application . """
     return render_template("index.html", title="Rentier")
 
 
 @app.route("/predict", methods=["GET", "POST"])
 @login_required
-def predict():
+def predict(): 
+    """ Show prediction form page, and handle recieving, predicting and recording down data """
     pred_form = Prediction()
     show_result = False
     results = {}
@@ -89,10 +91,21 @@ def predict():
 
 @app.route("/history", methods=["GET"])
 @login_required
-def history():
+def history(): 
+    """ View the history of the user """
     history = get_history(session["user_id"])
     return render_template("history.html", title="Rentier | History", history=history)
 
+
+@app.route("/delete/<id>", methods=["POST"])
+@login_required
+def delete_entry(id):
+    # Check if user owns the id of the entry
+    user_id = session["user_id"]
+    result = db.session.query(Entry).filter_by(id=id, user_id=user_id).first()
+    if result is None:
+        flash("User does not have permission to delete this entry", "danger")
+        abort(403)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -100,17 +113,17 @@ def login():
     if request.method == "POST":
         try:
             if not loginForm.validate_on_submit():
-                raise Exception
+                abort(400)
             email = loginForm.email.data
             password = loginForm.password.data
             remember = loginForm.remember_me.data
             rows = db.session.query(User).filter_by(email = email).all()
             if len(rows) == 0:
                 flash("User does not exist", "danger")
-                raise Exception
+                abort(400)
             if not check_password_hash(rows[0].password_hash, password):
                 flash("Password is incorrect!", "danger")
-                raise Exception
+                abort(400)
             session["user_id"] = rows[0].id
             flash(f"Logged In", "success")
             if remember:
@@ -132,7 +145,7 @@ def register():
     if request.method == "POST":
         try:
             if not registerForm.validate_on_submit():
-                raise Exception
+                abort(400)
             email = registerForm.email.data
             password_hash = generate_password_hash(registerForm.password.data)
             new_user = User(
