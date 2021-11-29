@@ -29,9 +29,9 @@ def predict():
             minimum_nights = pred_form.minimum_nights.data
             room_type = pred_form.room_type.data
             neighborhood = pred_form.neighborhood.data
-            wifi = pred_form.wifi.data
-            elevator = pred_form.elevator.data
-            pool = pred_form.pool.data
+            wifi = int(pred_form.wifi.data)
+            elevator = int(pred_form.elevator.data)
+            pool = int(pred_form.pool.data)
             actual_price = pred_form.actual_price.data
             link = pred_form.link.data # store link for history
             entry_params = pd.DataFrame(
@@ -53,11 +53,9 @@ def predict():
                 "price" : result[0],
                 "actual_price" : actual_price
             }
-
             if actual_price is not None:
                 results["price_diff"] = abs(actual_price - result[0])
                 results["same"] = results["price_diff"] < 0.05 # account for floating point inprecision
-
             new_entry = Entry(
                 beds = beds,
                 bathrooms = bathrooms,
