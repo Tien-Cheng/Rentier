@@ -156,7 +156,7 @@ class User(db.Model):
 
     @validates("password_hash")
     def validate_hash(self, key, password_hash):
-        assert len(password_hash) == 64, "Password hash should be 64 characters long."
+        assert len(password_hash) >= 64, "Password hash should be at least 64 characters long."
         return password_hash
 
     @validates("created")
