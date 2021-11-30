@@ -91,31 +91,31 @@ def test_EntryClass(entrylist, capsys):
 3. Out of range input
 """
 
-
-@pytest.mark.xfail(reason="User referenced in Entry does not exist")
-@pytest.mark.parametrize(
-    "entrylist",
-    [
-        [
-            0,  # User id 0 should not exist
-            1,
-            1,
-            2,
-            90,
-            "Private room",
-            "Bukit Timah",
-            True,
-            True,
-            True,
-            80,
-            "https://www.airbnb.com/rooms/71896",  # Test optional
-            70.83,
-        ],
-        [None, 2, 1, 4, 10, "Private room", "Ang Mo Kio", 1, 0, 1, 60, None, 54.5],
-    ],
-)
-def test_EntryValidation_UserDoesNotExist(entrylist, capsys):
-    test_EntryClass(entrylist, capsys)
+### TODO: Move to api testing, as not possible to test here
+# @pytest.mark.xfail(reason="User referenced in Entry does not exist")
+# @pytest.mark.parametrize(
+#     "entrylist",
+#     [
+#         [
+#             0,  # User id 0 should not exist
+#             1,
+#             1,
+#             2,
+#             90,
+#             "Private room",
+#             "Bukit Timah",
+#             True,
+#             True,
+#             True,
+#             80,
+#             "https://www.airbnb.com/rooms/71896",  # Test optional
+#             70.83,
+#         ],
+#         [None, 2, 1, 4, 10, "Private room", "Ang Mo Kio", 1, 0, 1, 60, None, 54.5],
+#     ],
+# )
+# def test_EntryValidation_UserDoesNotExist(entrylist, capsys):
+#     test_EntryClass(entrylist, capsys)
 
 
 @pytest.mark.xfail(reason="Invalid Data Type")
