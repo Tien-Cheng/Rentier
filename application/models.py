@@ -84,13 +84,14 @@ class Entry(db.Model):
     
     @validates("actual_price")
     def validate_actual_price(self, key, actual_price):
-        assert actual_price is None or type(actual_price) is float, "Either actual price should be None or float"
+        assert type(actual_price) in {type(None), int, float}, "Either actual price should be None, int or float"
         if actual_price is not None:
             assert actual_price >= 0, "Actual price should be greater than or equal to 0"
         return actual_price
 
     @validates("prediction")
     def validate_prediction(self, key, prediction):
+        assert type(prediction) is float, "Data type should be a float"
         assert prediction > 0, "Prediction should be positive"
         return prediction
 
@@ -144,7 +145,7 @@ class User(db.Model):
     history = db.relationship("Entry", backref="user", lazy=True)
 
     @validates("email")
-    def validate_email(self, email):
+    def validate_email(self, key, email):
         """
         Validate email address. Email address should already have been validated by the Flask Form, but we double check the input here just in case
         """
