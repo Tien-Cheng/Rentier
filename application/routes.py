@@ -1,5 +1,5 @@
 from application import app, db, ai_model
-from application.models import User, add_user, Entry, add_entry, get_history
+from application.models import User, add_user, Entry, add_entry, get_history, delete_entry
 from flask import render_template, request, flash, redirect, abort, session, url_for
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -97,15 +97,24 @@ def history():
     return render_template("history.html", title="Rentier | History", history=history)
 
 
-@app.route("/delete/<id>", methods=["POST"])
+@app.route("/delete", methods=["POST"])
 @login_required
-def delete_entry(id):
+def delete():
     # Check if user owns the id of the entry
-    user_id = session["user_id"]
-    result = db.session.query(Entry).filter_by(id=id, user_id=user_id).first()
-    if result is None:
-        flash("User does not have permission to delete this entry", "danger")
-        abort(403)
+    try:
+        id = request.form.get("id")
+        user_id = session["user_id"]
+        result = db.session.query(Entry).filter_by(id=id, user_id=user_id).first()
+        if result is None:
+            flash("User does not have permission to delete this entry", "danger")
+            abort(403)
+        delete_entry(result)
+        return redirect(url_for("history"))
+    except Exception as error:
+        flash(str(error), "danger")
+
+    
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
