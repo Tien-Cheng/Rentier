@@ -3,7 +3,6 @@ from datetime import datetime as dt
 import pytest
 
 
-
 # Unit Tests
 
 
@@ -479,4 +478,45 @@ def test_EntryValidation_InvalidDataType(entrylist, capsys):
     ],
 )
 def test_EntryValidation_RangeTest(entrylist, capsys):
+    test_EntryClass(entrylist, capsys)
+
+
+@pytest.mark.xfail(reason="Missing inpputs")
+@pytest.mark.parametrize(
+    "entrylist",
+    [
+        [],
+        [
+            1,
+            2,
+            5,
+            1,
+            90,
+            "Private room",
+            "Bukit Timah",
+            True,
+            True,
+            100,
+            "https://www.airbnb.com/rooms/71896",
+            431,
+        ],
+        [
+            1,
+            2,
+            5,
+            1,
+            2,
+            90,
+            "Private room",
+            "Bukit Timah",
+            True,
+            True,
+            True,
+            100,
+            "https://www.airbnb.com/rooms/71896",
+            None,  # cannot be None (missing)
+        ],
+    ],
+)
+def test_EntryValidationMissing(entrylist, capsys):
     test_EntryClass(entrylist, capsys)
