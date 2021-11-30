@@ -321,6 +321,8 @@ def test_EntryValidation_UserDoesNotExist(entrylist, capsys):
 )
 def test_EntryValidation_InvalidDataType(entrylist, capsys):
     test_EntryClass(entrylist, capsys)
+
+    # Below lines no longer needed due to built in validty test in class
     # with capsys.disabled():
     #     assert type(entrylist[0]) is int, "User ID should be an integer"
     #     assert type(entrylist[1]) is int, "Data type of beds should be a int"
