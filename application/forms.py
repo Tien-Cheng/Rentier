@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-
+from application import NEIGHBORHOODS, ROOM_TYPES
 from wtforms import BooleanField, SelectField, SubmitField, PasswordField, FloatField, IntegerField
 
 from wtforms.fields.html5 import URLField, EmailField
@@ -40,60 +40,13 @@ class Prediction(FlaskForm):
     room_type = SelectField(
         "Room Type",
         validators=[InputRequired()],
-        choices=sorted(["Private room", "Entire home/apt", "Shared room"]),
+        choices=ROOM_TYPES,
     )
 
     neighborhood = SelectField(
         "Neighborhood",
         validators=[InputRequired()],
-        choices=sorted(
-            [
-                "Bukit Timah",
-                "Tampines",
-                "Bukit Merah",
-                "Queenstown",
-                "Newton",
-                "Geylang",
-                "River Valley",
-                "Serangoon",
-                "Jurong West",
-                "Rochor",
-                "Downtown Core",
-                "Marine Parade",
-                "Outram",
-                "Bedok",
-                "Kallang",
-                "Novena",
-                "Tanglin",
-                "Pasir Ris",
-                "Ang Mo Kio",
-                "Bukit Batok",
-                "Choa Chu Kang",
-                "Hougang",
-                "Woodlands",
-                "Singapore River",
-                "Jurong East",
-                "Orchard",
-                "Museum",
-                "Toa Payoh",
-                "Bukit Panjang",
-                "Sembawang",
-                "Bishan",
-                "Yishun",
-                "Sengkang",
-                "Punggol",
-                "Clementi",
-                "Mandai",
-                "Western Water Catchment",
-                "Southern Islands",
-                "Tuas",
-                "Sungei Kadut",
-                "Pioneer",
-                "Central Water Catchment",
-                "Marina South",
-                "Lim Chu Kang",
-            ]
-        ),
+        choices=NEIGHBORHOODS,
     )
 
     wifi = BooleanField("Wifi", default=True)
