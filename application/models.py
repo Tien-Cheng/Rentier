@@ -1,4 +1,4 @@
-from application import db
+from application import db, NEIGHBORHOODS, ROOM_TYPES
 import datetime as dt
 import re
 from flask import flash
@@ -75,11 +75,13 @@ class Entry(db.Model):
     @validates("neighborhood")
     def validate_neighborhood(self, key, neighborhood):
         assert type(neighborhood) is str, "Data type should be a string"
+        assert neighborhood in NEIGHBORHOODS, "Neighborhood should be one of the recognized neighborhoods"
         return neighborhood
 
     @validates("room_type")
     def validate_room_type(self, key, room_type):
         assert type(room_type) is str, "Data type should be a string"
+        assert room_type in ROOM_TYPES, "Room Type should be one of the valid Room Types"
         return room_type
     
     @validates("actual_price")
@@ -109,6 +111,13 @@ def add_entry(entry):
         flash(str(error), "danger")
         raise Exception
 
+def delete_entry(entry):
+    try:
+        db.session.delete(entry)
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        raise Exception
 
 def get_history(user_id):
     try:
@@ -116,6 +125,7 @@ def get_history(user_id):
     except Exception as error:
         flash(str(error), "danger")
         raise Exception
+
 
 
 class User(db.Model):
