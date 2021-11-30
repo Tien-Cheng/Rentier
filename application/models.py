@@ -37,6 +37,7 @@ class Entry(db.Model):
 
     @validates("bathrooms")
     def validate_bathrooms(self, key, bathrooms):
+        assert type(bathrooms) in {int, float}, "Bathrooms should be an integer or float"
         assert bathrooms >= 0, "Bathrooms should be greater than or equal to 0"
         return bathrooms
 
@@ -91,7 +92,7 @@ class Entry(db.Model):
 
     @validates("prediction")
     def validate_prediction(self, key, prediction):
-        assert type(prediction) is float, "Data type should be a float"
+        assert type(prediction) in {int, float} , "Data type should be a float or int"
         assert prediction > 0, "Prediction should be positive"
         return prediction
 
