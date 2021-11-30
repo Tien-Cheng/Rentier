@@ -31,9 +31,9 @@ def predict():
             minimum_nights = pred_form.minimum_nights.data
             room_type = pred_form.room_type.data
             neighborhood = pred_form.neighborhood.data
-            wifi = int(pred_form.wifi.data)
-            elevator = int(pred_form.elevator.data)
-            pool = int(pred_form.pool.data)
+            wifi = pred_form.wifi.data
+            elevator = pred_form.elevator.data
+            pool = pred_form.pool.data
             actual_price = pred_form.actual_price.data
             link = pred_form.link.data # store link for history
             entry_params = pd.DataFrame(
@@ -44,9 +44,9 @@ def predict():
                     "minimum_nights" : [minimum_nights],
                     "room_type" : [room_type],
                     "neighbourhood_cleansed" : [neighborhood],
-                    "wifi" : [wifi],
-                    "elevator" : [elevator],
-                    "pool" : [pool],
+                    "wifi" : [int(wifi)],
+                    "elevator" : [int(elevator)],
+                    "pool" : [int(pool)],
                 }
             )
             result = ai_model.predict(entry_params)

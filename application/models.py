@@ -12,10 +12,10 @@ class Entry(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    beds = db.Column(db.Integer, nullable=False)
+    beds = db.Column(db.SmallInteger, nullable=False)
     bathrooms = db.Column(db.Float, nullable=False)
-    accomodates = db.Column(db.Integer, nullable=False)
-    minimum_nights = db.Column(db.Integer, nullable=False)
+    accomodates = db.Column(db.SmallInteger, nullable=False)
+    minimum_nights = db.Column(db.SmallInteger, nullable=False)
     room_type = db.Column(db.String(100), nullable=False)
     neighborhood = db.Column(db.String(100), nullable=False)
     wifi = db.Column(db.Boolean, nullable=False)
@@ -32,6 +32,7 @@ class Entry(db.Model):
         assert (
             beds >= 0
         ), "Beds should be greater than or equal to 0 (some AirBNB listings have no beds)"
+        # TODO: Consider putting upper bound on parameters
         return beds
 
     @validates("bathrooms")
@@ -56,20 +57,17 @@ class Entry(db.Model):
 
     @validates("wifi")
     def validate_wifi(self, key, wifi):
-        assert type(wifi) is int, "Data type should be a int"
-        assert wifi in {1, 0}, "Wifi should be 1 or 0"
+        assert type(wifi) is bool, "data type should be a boolean"
         return wifi
 
     @validates("elevator")
     def validate_elevator(self, key, elevator):
-        assert type(elevator) is int, "Data type should be a int"
-        assert elevator in {1, 0}, "Elevator should be 1 or 0"
+        assert type(elevator) is bool, "data type should be a boolean"
         return elevator
 
     @validates("pool")
     def validate_pool(self, key, pool):
-        assert type(pool) is int, "Data type should be a int"
-        assert pool in {1, 0}, "Pool should be 1 or 0"
+        assert type(pool) is bool, "data type should be a boolean"
         return pool
 
     @validates("neighborhood")
