@@ -98,3 +98,12 @@ def test_user_login_api(client, userlist, capsys):
             assert response_body["remember_me"] == userlist[2]
             assert session.permanent == response_body["remember_me"]
             assert session["user_id"] == response_body["id"]
+
+# @pytest.mark.usefixtures("populate_users") # Does not work as login fixture not working
+# @pytest.mark.usefixtures("login")
+# def test_user_logout(client, capsys):
+#     with capsys.disabled():
+#         with client:
+#             response = client.post("/logout")
+#             assert 'user_id' not in session
+#             assert response.status_code == 302
