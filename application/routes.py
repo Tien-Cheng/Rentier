@@ -203,7 +203,6 @@ def api_add_user():
     email = data["email"]
     password_hash = generate_password_hash(data["password"])
     created = datetime.utcnow()
-
     # Create a new entry into user table
     new_user = User(email=email, password_hash=password_hash, created=created)
 
@@ -218,3 +217,38 @@ def api_add_user():
             "created" : created
         }
     )
+
+@app.route("/api/login", methods=["POST"])
+def api_login_user():
+    data = request.get_json()
+    email = data["email"]
+    password = data["password"]
+    remember_me = data["remember_me"]
+    rows = db.session.query(User).filter_by(email=email).all()
+    if len(rows) == 0:
+        abort(400)
+    if not check_password_hash(rows[0].password_hash, password):
+        abort(400)
+    session["user_id"] = rows[0].id
+    flash(f"Logged In", "success")
+    if remember_me:
+        session.permanent = True
+    else:
+        session.permanent = False
+
+    return jsonify({
+        "id" : rows[0].id,
+        "email" : email,
+        "password" : password,
+        "remember_me" : remember_me
+    })
+
+@app.route("/api/predict", methods=["POST"])
+def api_predict():
+    data = request.get_json()
+    X = pd.DataFrame(data)
+    result = ai_model.predict(X)
+    return jsonify({
+        "prediction" : result
+    })
+
