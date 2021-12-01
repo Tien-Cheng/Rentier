@@ -11,7 +11,6 @@ from werkzeug.security import generate_password_hash
 )
 def test_UserClass(userlist, capsys):
     with capsys.disabled():
-        print(userlist)
         created = dt.utcnow()
         password_hash = generate_password_hash(userlist[1])
         new_user = User(
@@ -45,11 +44,12 @@ def test_UserClass(userlist, capsys):
     "userlist",
     [
         ["invalid_email", "Password1234!@#$"],
-        ["valid@email.com", "invalid_password!!!"],  # no numbers
-        ["yeet@ichat.com", "short"],  # too short
+        # Removed these, as model validation cannot check password, since it is already hashed. 
+        # ["valid@email.com", "invalid_password!!!"],  # no numbers
+        # ["yeet@ichat.com", "short"],  # too short
         ["sp.edu.sg", "Password1234!@#$"],
         ["hello world", "Password1234!@"],
-        ["valid_2@gmail.com", "Passowrd1234"],  # no symbol
+        # ["valid_2@gmail.com", "Passowrd1234"],  # no symbol
     ],
 )
 def test_UserClassValidation_invaliddetails(userlist, capsys):
@@ -65,3 +65,5 @@ def test_UserClassValidation_invaliddetails(userlist, capsys):
 ])
 def test_UserClassValidation_missing(userlist, capsys):
     test_UserClass(userlist, capsys)
+
+
