@@ -22,10 +22,13 @@ def populate_users():
         }
     ]
     for user in users:
-        db.session.add(
-            User(email=user["email"], password_hash = generate_password_hash(user["password"]), created=dt.utcnow())
-        )
-        db.session.commit()
+        try:
+            db.session.add(
+                User(email=user["email"], password_hash = generate_password_hash(user["password"]), created=dt.utcnow())
+            )
+            db.session.commit()
+        except:
+            db.session.rollback()
 
 @pytest.fixture
 def client(app):
