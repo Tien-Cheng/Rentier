@@ -1,7 +1,7 @@
 from application import db, NEIGHBORHOODS, ROOM_TYPES
 import datetime as dt
 import re
-from flask import flash
+from flask import flash, abort
 from sqlalchemy.orm import validates
 
 from sqlalchemy.exc import IntegrityError
@@ -109,7 +109,7 @@ def add_entry(entry):
     except Exception as error:
         db.session.rollback()
         flash(str(error), "danger")
-        raise Exception
+        abort(500)
 
 def delete_entry(entry):
     try:
@@ -117,14 +117,14 @@ def delete_entry(entry):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
-        raise Exception
+        abort(500)
 
 def get_history(user_id):
     try:
         return db.session.query(Entry).filter_by(user_id=user_id).all()
     except Exception as error:
         flash(str(error), "danger")
-        raise Exception
+        abort(500)
 
 
 
@@ -172,8 +172,8 @@ def add_user(new_user):
     except IntegrityError:
         db.session.rollback()
         flash("User with same email already exists", "danger")
-        raise Exception
+        abort(400)
     except Exception as error:
         db.session.rollback()
         flash(str(error), "danger")
-        raise Exception
+        abort(500)
