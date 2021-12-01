@@ -61,9 +61,9 @@ def predict():
                     "minimum_nights": [minimum_nights],
                     "room_type": [room_type],
                     "neighbourhood_cleansed": [neighborhood],
-                    "wifi": [int(wifi)],
-                    "elevator": [int(elevator)],
-                    "pool": [int(pool)],
+                    "wifi": [wifi],
+                    "elevator": [elevator],
+                    "pool": [pool],
                 }
             )
             result = ai_model.predict(entry_params)
@@ -214,9 +214,10 @@ def api_add_user():
             "id": result,
             "email": email,
             "password_hash": password_hash,
-            "created" : created
+            "created": created,
         }
     )
+
 
 @app.route("/api/login", methods=["POST"])
 def api_login_user():
@@ -236,19 +237,40 @@ def api_login_user():
     else:
         session.permanent = False
 
-    return jsonify({
-        "id" : rows[0].id,
-        "email" : email,
-        "password" : password,
-        "remember_me" : remember_me
-    })
+    return jsonify(
+        {
+            "id": rows[0].id,
+            "email": email,
+            "password": password,
+            "remember_me": remember_me,
+        }
+    )
+
 
 @app.route("/api/predict", methods=["POST"])
-def api_predict():
+def api_predict(): # TODO: Implement input validation
     data = request.get_json()
-    X = pd.DataFrame(data)
+    beds = data["beds"]
+    bathrooms = data["bathrooms"]
+    accomodates = data["accomodates"]
+    minimum_nights = data["minimum_nights"]
+    room_type = data["room_type"]
+    neighborhood = data["neighborhood"]
+    wifi = data["wifi"]
+    elevator = data["elevator"]
+    pool = data["pool"]
+    X = pd.DataFrame(
+        {
+            "beds": [beds],
+            "bathrooms_cleaned": [bathrooms],
+            "accommodates": [accomodates],
+            "minimum_nights": [minimum_nights],
+            "room_type": [room_type],
+            "neighbourhood_cleansed": [neighborhood],
+            "wifi": [wifi],
+            "elevator": [elevator],
+            "pool": [pool],
+        }
+    )
     result = ai_model.predict(X)
-    return jsonify({
-        "prediction" : result
-    })
-
+    return jsonify({"prediction": result[0]})
