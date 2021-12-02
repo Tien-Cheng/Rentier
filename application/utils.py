@@ -3,7 +3,14 @@ from flask import redirect, request, url_for, session, flash
 
 
 def login_required(func):
-    """Decorator to check if user is logged in ."""
+    """Flask decorator to check if a user is logged in, else, redirect them to login page, which will direct them back to the original page once logged in. Checks if the secured session cookie contains a user id.
+
+    Args:
+        func (Callable): Function to be decorated (usually an endpoint)
+
+    Returns:
+        [Callable]: Decorated function, which will first check if a user is logged in
+    """
 
     @wraps(func)
     def decorated_func(*args, **kwargs):
