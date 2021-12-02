@@ -43,20 +43,3 @@ def populate_users():
 def client(app):
     print(app.static_url_path)
     return app.test_client()
-
-
-# @pytest.fixture # does not work
-# def login(client):
-#     with client:
-#         client.post(
-#             "/login",
-#             data=json.dumps(
-#                 {
-#                     "email": "user_1@example.com",
-#                     "password": "Password1234!",
-#                     "remember_me": True,
-#                 }
-#             ),
-#             content_type="application/json"
-#         )
-#         return client
