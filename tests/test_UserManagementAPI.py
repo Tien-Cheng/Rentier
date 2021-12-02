@@ -61,7 +61,7 @@ def test_user_add_api_duplicate_email(client, userlist, capsys):
 
         # Send a post request to the api
         response = client.post(
-            "/api/users/add", data=json.dumps(data), content_type="application/json"
+            "/api/users", data=json.dumps(data), content_type="application/json"
         )
         # response_body = json.loads(response.get_data(as_text=True))
 
