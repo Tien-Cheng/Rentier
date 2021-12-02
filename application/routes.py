@@ -20,7 +20,7 @@ from flask import (
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
 from application.utils import login_required
-from datetime import datetime
+from datetime import datetime as dt
 import pandas as pd
 
 # Create database if does not exist
@@ -87,7 +87,7 @@ def predict():
                 actual_price=actual_price,
                 link=link,
                 prediction=float(result[0]),
-                created=datetime.utcnow(),
+                created=dt.utcnow(),
                 user_id=session["user_id"],
             )
             try:
@@ -202,7 +202,7 @@ def api_add_user():
     # Retrieve fields from data
     email = data["email"]
     password_hash = generate_password_hash(data["password"])
-    created = datetime.utcnow()
+    created = dt.utcnow()
     # Create a new entry into user table
     new_user = User(email=email, password_hash=password_hash, created=created)
 
@@ -248,7 +248,7 @@ def api_login_user():
 
 
 @app.route("/api/predict", methods=["POST"])
-def api_predict(): # TODO: Implement input validation
+def api_predict():  # TODO: Implement input validation
     data = request.get_json()
     beds = data["beds"]
     bathrooms = data["bathrooms"]
@@ -274,3 +274,42 @@ def api_predict(): # TODO: Implement input validation
     )
     result = ai_model.predict(X)
     return jsonify({"prediction": result[0]})
+
+
+@app.route("/api/history/add", methods=["POST"])
+def api_add_history():
+    data = request.get_json()
+    user_id = data["user_id"]
+    beds = data["beds"]
+    bathrooms = data["bathrooms"]
+    accomodates = data["accomodates"]
+    minimum_nights = data["minimum_nights"]
+    room_type = data["room_type"]
+    neighborhood = data["neighborhood"]
+    wifi = data["wifi"]
+    elevator = data["elevator"]
+    pool = data["pool"]
+    actual_price = data["actual_price"]
+    link = data["link"]
+    prediction = data["prediction"]
+
+    new_entry = Entry(
+        beds=beds,
+        bathrooms=bathrooms,
+        accomodates=accomodates,
+        minimum_nights=minimum_nights,
+        room_type=room_type,
+        neighborhood=neighborhood,
+        wifi=wifi,
+        elevator=elevator,
+        pool=pool,
+        actual_price=actual_price,
+        link=link,
+        prediction=float(prediction),
+        created=dt.utcnow(),
+        user_id=user_id,
+    )
+
+    result = add_entry(new_entry)
+
+    return jsonify({"result": result})
