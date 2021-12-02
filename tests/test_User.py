@@ -25,21 +25,8 @@ def test_UserClass(userlist, capsys):
 
 
 ## Expected Failure
-"""
-1. Duplicate email
-2. Invalid email
-3. Invalid password
-"""
-### TODO: move to registration endpoint api testing
-# @pytest.mark.xfail(reason="Duplicate email")
-# @pytest.mark.parametrize("userlist", [
-#     ["user@alrexists.com", "Password1234!@#$"]
-# ])
-# def test_UserValidation_duplicate_email(userlist, capsys):
-#     test_UserClass(userlist, capsys)
 
-
-@pytest.mark.xfail(reason="Invalid email or password")
+@pytest.mark.xfail(reason="Invalid email", strict=True)
 @pytest.mark.parametrize(
     "userlist",
     [
@@ -55,7 +42,7 @@ def test_UserClass(userlist, capsys):
 def test_UserClassValidation_invaliddetails(userlist, capsys):
     test_UserClass(userlist, capsys)
 
-@pytest.mark.xfail(reason="Missing inputs")
+@pytest.mark.xfail(reason="Missing inputs", strict=True)
 @pytest.mark.parametrize("userlist", [
     [],
     [None, None],
