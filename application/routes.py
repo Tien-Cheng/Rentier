@@ -211,7 +211,7 @@ def logout():
     return redirect(url_for("index"))
 
 
-@app.route("/api/users/add", methods=["POST"])
+@app.route("/api/users/", methods=["POST"])
 def api_add_user():
     """
     Api for adding new users
@@ -302,10 +302,9 @@ def api_predict():  # TODO: Implement input validation
     return jsonify({"prediction": result[0]})
 
 
-@app.route("/api/history/add", methods=["POST"])
-def api_add_history():
+@app.route("/api/history/<id>", methods=["POST"])
+def api_add_history(id):
     data = request.get_json()
-    user_id = data["user_id"]
     beds = data["beds"]
     bathrooms = data["bathrooms"]
     accomodates = data["accomodates"]
@@ -318,24 +317,35 @@ def api_add_history():
     actual_price = data["actual_price"]
     link = data["link"]
     prediction = data["prediction"]
+    try:
+        new_entry = Entry(
+            beds=beds,
+            bathrooms=bathrooms,
+            accomodates=accomodates,
+            minimum_nights=minimum_nights,
+            room_type=room_type,
+            neighborhood=neighborhood,
+            wifi=wifi,
+            elevator=elevator,
+            pool=pool,
+            actual_price=actual_price,
+            link=link,
+            prediction=float(prediction),
+            created=dt.utcnow(),
+            user_id=id,
+        )
 
-    new_entry = Entry(
-        beds=beds,
-        bathrooms=bathrooms,
-        accomodates=accomodates,
-        minimum_nights=minimum_nights,
-        room_type=room_type,
-        neighborhood=neighborhood,
-        wifi=wifi,
-        elevator=elevator,
-        pool=pool,
-        actual_price=actual_price,
-        link=link,
-        prediction=float(prediction),
-        created=dt.utcnow(),
-        user_id=user_id,
-    )
+        result = add_entry(new_entry)
+        return jsonify({"result": result})
+    except Exception as e:
+        return jsonify({"result": str(e)})
 
-    result = add_entry(new_entry)
 
-    return jsonify({"result": result})
+@app.route('/api/history/<id>', methods=["GET"])
+def get_user_history(id):
+    entries = get_history(id)
+    result = [
+        entry.__dict__ for entry in entries
+    ]
+    return jsonify(result)
+    
