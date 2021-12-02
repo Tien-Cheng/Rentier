@@ -18,15 +18,28 @@
 
 <body>
     {% include "includes/nav.html" %}
-    <div class="container fixed-bottom">
+    <div class="fixed-bottom">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        {% for category, message in messages %}
-        <div class="col-lg-7 mx-auto alert alert-{{category}} alert-dismissible fade show" role="alert">
+        <div class="toast-container position-absolute bottom-0 end-0 p-3">
+            {% for category, message in messages %}
+            <!-- <div class="col-lg-7 mx-auto alert alert-{{category}} alert-dismissible fade show" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+        </div> -->
+            <div class="toast show fade" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header text-{{category}}">
+                    <i class="bi bi-exclamation-circle-fill me-2 "></i>
+                    <strong class="me-auto">Error</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="close"></button>
+                </div>
+                <div class="toast-body">
+                    {{ message }}
+                </div>
+            </div>
+
+            {% endfor %}
         </div>
-        {% endfor %}
         {% endif %}
         {% endwith %}
     </div>
@@ -35,7 +48,9 @@
         {% endblock %}
 
     </main>
+
     {% include "includes/footer.html" %}
+
 </body>
 
 </html>
