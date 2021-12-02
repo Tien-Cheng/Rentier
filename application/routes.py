@@ -29,14 +29,18 @@ db.create_all()
 
 @app.route("/", methods=["GET"])
 def index():
-    """This function serves as a view of the web server . It is used to render the index template for the application ."""
+    """
+    Returns the home page of the application.
+    """
     return render_template("index.html", title="Rentier")
 
 
 @app.route("/predict", methods=["GET", "POST"])
 @login_required
 def predict():
-    """Show prediction form page, and handle recieving, predicting and recording down data"""
+    """
+    Show prediction form page, and handle recieving, predicting and recording down data
+    """
     pred_form = Prediction()
     show_result = False
     results = {}
@@ -108,7 +112,9 @@ def predict():
 @app.route("/history", methods=["GET"])
 @login_required
 def history():
-    """View the history of the user"""
+    """
+    Return history page, containing the specific history of a user
+    """
     history = get_history(session["user_id"])
     return render_template("history.html", title="Rentier | History", history=history)
 
@@ -116,7 +122,9 @@ def history():
 @app.route("/delete", methods=["POST"])
 @login_required
 def delete():
-    # Check if user owns the id of the entry
+    """
+    Delete entry from history
+    """
     try:
         id = request.form.get("id")
         user_id = session["user_id"]
@@ -132,6 +140,9 @@ def delete():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """
+    Return login page and handle login functionalithy
+    """
     loginForm = Login()
     if request.method == "POST":
         try:
@@ -164,6 +175,9 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    """
+    Handle creation of accounts
+    """
     registerForm = Register()
     if request.method == "POST":
         try:
@@ -188,6 +202,9 @@ def register():
 @app.route("/logout", methods=["POST"])
 @login_required
 def logout():
+    """
+    Logout current user from session
+    """
     # remove user from session
     session.pop("user_id", None)
     flash("Logged Out", "warning")
@@ -196,6 +213,9 @@ def logout():
 
 @app.route("/api/users/add", methods=["POST"])
 def api_add_user():
+    """
+    Api for adding new users
+    """
     # Get json file posted from client
     data = request.get_json()
 
@@ -221,6 +241,9 @@ def api_add_user():
 
 @app.route("/api/login", methods=["POST"])
 def api_login_user():
+    """
+    Api for logging in new user
+    """
     data = request.get_json()
     email = data["email"]
     password = data["password"]
@@ -249,6 +272,9 @@ def api_login_user():
 
 @app.route("/api/predict", methods=["POST"])
 def api_predict():  # TODO: Implement input validation
+    """
+    Api for requesting and returning user predictions based on user input
+    """
     data = request.get_json()
     beds = data["beds"]
     bathrooms = data["bathrooms"]
@@ -278,6 +304,9 @@ def api_predict():  # TODO: Implement input validation
 
 @app.route("/api/history/add", methods=["POST"])
 def api_add_history():
+    """
+    Api for adding new entries to a user's history
+    """
     data = request.get_json()
     user_id = data["user_id"]
     beds = data["beds"]
