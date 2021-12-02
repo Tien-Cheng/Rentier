@@ -342,7 +342,7 @@ def api_add_history(id):
 
 
 @app.route('/api/history/<id>', methods=["GET"])
-def get_user_history(id):
+def api_get_user_history(id):
     entries = get_history(id)
     result = [
         {
@@ -364,3 +364,12 @@ def get_user_history(id):
     ]
     return jsonify(result)
     
+@app.route('/api/history/<user_id>/<id>/', methods=["DELETE"])
+def api_delete_entry(user_id, id):
+    result = db.session.query(Entry).filter_by(id=id, user_id=user_id).first()
+    if result is None:
+        abort(403)
+    result = delete_entry(result)
+    return jsonify({
+        "result" : result
+    })
