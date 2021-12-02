@@ -23,7 +23,22 @@ from application import app
             178,  # Actual price
             "https://www.airbnb.com/rooms/71609",  # Link to listing
             155.06,  # Predicted
-        ]
+        ],
+        [
+            1,  # User ID
+            2,  # Beds
+            1,  # Bathrooms
+            3,  # Accomodates
+            90,  # Minimum Nights
+            "Shared room",  # Room type
+            "Marine Parade",  # Neighborhood
+            True,  # Wifi
+            True,  # Elevator
+            False,  # Pool
+            None,  # Actual price
+            None,  # Link to listing
+            95.09,  # Predicted
+        ],
     ],
 )
 def test_add_entry(client, entrylist, capsys):
@@ -125,6 +140,25 @@ def test_add_entry_invalid_user_id(client, entrylist, capsys):
                     "actual_price": 178,
                     "link": "https://www.airbnb.com/rooms/71609",
                     "prediction": 155.06,
+                }
+            ],
+        },
+        {
+            "user_id": 1,
+            "history": [
+                {
+                    "beds": 2,
+                    "bathrooms": 1,
+                    "accomodates": 3,
+                    "minimum_nights": 90,
+                    "room_type": "Shared room",
+                    "neighborhood": "Marine Parade",
+                    "wifi": True,
+                    "elevator": True,
+                    "pool": False,
+                    "actual_price": None,
+                    "link": None,
+                    "prediction": 95.09,
                 }
             ],
         },
