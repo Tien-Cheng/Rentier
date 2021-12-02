@@ -186,7 +186,7 @@ def register():
             email = registerForm.email.data
             password_hash = generate_password_hash(registerForm.password.data)
             new_user = User(
-                email=email, password_hash=password_hash, created=datetime.utcnow()
+                email=email, password_hash=password_hash, created=dt.utcnow()
             )
             add_user(new_user)
             flash(f"Account Registered. Please Log In.", "success")
@@ -304,9 +304,6 @@ def api_predict():  # TODO: Implement input validation
 
 @app.route("/api/history/add", methods=["POST"])
 def api_add_history():
-    """
-    Api for adding new entries to a user's history
-    """
     data = request.get_json()
     user_id = data["user_id"]
     beds = data["beds"]
