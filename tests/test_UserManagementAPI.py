@@ -17,7 +17,7 @@ def test_user_add_api(client, userlist, capsys):
 
         # Send a post request to the api
         response = client.post(
-            "/api/users/add", data=json.dumps(data), content_type="application/json"
+            "/api/users/", data=json.dumps(data), content_type="application/json"
         )
         response_body = json.loads(response.get_data(as_text=True))
 
@@ -44,7 +44,7 @@ def test_user_add_api(client, userlist, capsys):
 
 
 @pytest.mark.usefixtures("populate_users")
-@pytest.mark.xfail(reason="Duplicate email in database")
+@pytest.mark.xfail(reason="Duplicate email in database", strict=True)
 @pytest.mark.parametrize(
     "userlist",
     [

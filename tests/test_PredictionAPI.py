@@ -45,7 +45,10 @@ def test_predict_api(client, entrylist, capsys):
         assert abs(float(entrylist[-1]) - pred) < 1e-1, "Prediction value is not what the actual predicted value should be"
 
 
-@pytest.mark.xfail(reason="Inputs out of range")
+# TODO: Validty testing check that prediction has low error on train data
+
+
+@pytest.mark.xfail(reason="Inputs out of range", strict=True)
 @pytest.mark.parametrize(
     "entrylist",
     [
