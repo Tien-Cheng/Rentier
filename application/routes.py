@@ -345,7 +345,22 @@ def api_add_history(id):
 def get_user_history(id):
     entries = get_history(id)
     result = [
-        entry.__dict__ for entry in entries
+        {
+           "user_id" : entry.user_id,
+           "beds" : entry.beds,
+           "bathrooms" : entry.bathrooms,
+           "accomodates" : entry.accomodates,
+           "minimum_nights" : entry.minimum_nights,
+           "room_type" : entry.room_type,
+           "neighborhood" : entry.neighborhood,
+           "wifi" : entry.wifi,
+           "elevator" : entry.elevator,
+           "pool" : entry.pool,
+           "actual_price" : entry.actual_price,
+           "link" : entry.link,
+           "prediction" : entry.prediction,
+           "created" : entry.created
+        } for entry in entries
     ]
     return jsonify(result)
     
