@@ -133,9 +133,7 @@ def add_entry(entry):
         return entry.id
     except Exception as error:
         db.session.rollback()
-        flash(str(error), "danger")
         abort(500)
-
 
 def delete_entry(entry):
     try:

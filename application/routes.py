@@ -19,7 +19,7 @@ from flask import (
 )
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, BadRequest
 from application.utils import login_required
 from datetime import datetime as dt
 import pandas as pd
@@ -45,11 +45,13 @@ def predict():
     """
     Show prediction form page, and handle recieving, predicting and recording down data
     """
-    pred_form = Prediction()
-    show_result = False
-    results = {}
-    if request.method == "POST":
-        if pred_form.validate_on_submit():
+    try:
+        pred_form = Prediction()
+        show_result = False
+        results = {}
+        if request.method == "POST":
+            if not pred_form.validate_on_submit():
+                abort(400)
             beds = pred_form.beds.data
             bathrooms = pred_form.bathrooms.data
             accomodates = pred_form.accomodates.data
@@ -98,12 +100,10 @@ def predict():
                 created=dt.utcnow(),
                 user_id=session["user_id"],
             )
-            try:
-                add_entry(new_entry)
-            except Exception as error:
-                flash(f"Failed to add entry to history. Error: {error}", "danger")
-        else:
-            flash(f"Prediction failed", "danger")
+            add_entry(new_entry)
+    except BadRequest:
+        flash(f"Input validation failed. Please try again!", "danger")
+    
     return render_template(
         "predict.html",
         form=pred_form,
@@ -129,18 +129,14 @@ def delete():
     """
     Delete entry from history
     """
-    try:
-        id = request.form.get("id")
-        user_id = session["user_id"]
-        result = db.session.query(Entry).filter_by(id=id, user_id=user_id).first()
-        if result is None:
-            flash("User does not have permission to delete this entry", "danger")
-            abort(403)
+    id = request.form.get("id")
+    user_id = session["user_id"]
+    result = db.session.query(Entry).filter_by(id=id, user_id=user_id).first()
+    if result is None:
+        abort(403, description="You do not have permission to delete this entry!")
+    else:
         delete_entry(result)
-        return redirect(url_for("history"))
-    except Exception as error:
-        flash(str(error), "danger")
-
+    return redirect(url_for("history"))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -172,7 +168,7 @@ def login():
                 url = session["next"]
                 return redirect(url)
             return redirect(url_for("index"))
-        except:
+        except BadRequest:
             flash(f"Failed to Log In", "danger")
     return render_template("login.html", form=loginForm, title="Rentier | Login")
 
@@ -195,7 +191,7 @@ def register():
             add_user(new_user)
             flash(f"Account Registered. Please Log In.", "success")
             return redirect(url_for("login"))
-        except:
+        except BadRequest:
             flash("Failed to register account.", "danger")
 
     return render_template(
