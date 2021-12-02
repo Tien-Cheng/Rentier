@@ -141,6 +141,7 @@ def delete_entry(entry):
     try:
         db.session.delete(entry)
         db.session.commit()
+        return entry.id
     except Exception as error:
         db.session.rollback()
         abort(500)
