@@ -19,6 +19,7 @@ from flask import (
 )
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.exceptions import HTTPException
 from application.utils import login_required
 from datetime import datetime as dt
 import pandas as pd
@@ -26,6 +27,9 @@ import pandas as pd
 # Create database if does not exist
 db.create_all()
 
+@app.errorhandler(HTTPException)
+def http_error_handler(error):
+    return render_template("error.html", error=error)
 
 @app.route("/", methods=["GET"])
 def index():
