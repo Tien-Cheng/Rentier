@@ -2,23 +2,24 @@
 
 {% block content %}
 <div class="row">
-    <div class="px-4 py-5 my-5 col-lg-7 col-sm-12">
+    <div class="px-4 py-3 my-3 col-lg-7 col-sm-12">
         <h1 class="display-5 fw-bold text-left">
-            Error Code: {{ error.code }}
+            Error: {{ error.code }} {{ error.name }}
         </h1>
         <p class="lead mb-4">
-            {{ error.description }} <br>Looks like something went wrong! 
+            Looks like something went wrong! <br>
+            {{ error.description }}
         </p>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-left">
             <a href="/" class="btn btn-primary btn-lg">Go back home</a>
         </div>
     </div>
-    <figure class="px-4 py-5 my-5 col-lg-5  d-sm-none d-lg-block">
+    <figure class="px-4 py-1 my-1 col-lg-5  d-sm-none d-lg-block">
         <img src="{{ url_for('static', filename='images/11132.jpg')}}" class="img-fluid" alt="Rentier">
     </figure>
 </div>
 <p>
-    
+
 </p>
 
 

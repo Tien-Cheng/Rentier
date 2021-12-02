@@ -29,7 +29,7 @@ db.create_all()
 
 @app.errorhandler(HTTPException)
 def http_error_handler(error):
-    return render_template("error.html", error=error)
+    return render_template("error.html", error=error, title=f"Rentier | {error.name}")
 
 @app.route("/", methods=["GET"])
 def index():
