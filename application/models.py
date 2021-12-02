@@ -92,7 +92,7 @@ class Entry(db.Model):
 
     @validates("prediction")
     def validate_prediction(self, key, prediction):
-        assert type(prediction) in {int, float} , "Data type should be a float or int"
+        assert type(prediction) is float , "Data type should be a float or int"
         assert prediction > 0, "Prediction should be positive"
         return prediction
 

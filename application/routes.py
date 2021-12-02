@@ -86,7 +86,7 @@ def predict():
                 pool=pool,
                 actual_price=actual_price,
                 link=link,
-                prediction=result[0],
+                prediction=float(result[0]),
                 created=datetime.utcnow(),
                 user_id=session["user_id"],
             )
