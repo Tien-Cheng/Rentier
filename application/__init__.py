@@ -68,6 +68,6 @@ NEIGHBORHOODS = sorted(
 )
 
 
-ROOM_TYPES = set(sorted(["Private room", "Entire home/apt", "Shared room"]))
+ROOM_TYPES = set(["Private room", "Entire home/apt", "Shared room"])
 
 from application import routes
