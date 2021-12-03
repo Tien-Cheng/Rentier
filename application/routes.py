@@ -1,4 +1,4 @@
-from application import app, db, ai_model
+from application import app, db, ai_model, NEIGHBORHOODS, ROOM_TYPES
 from application.models import (
     User,
     add_user,
@@ -19,7 +19,7 @@ from flask import (
 )
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.exceptions import HTTPException, BadRequest
+from werkzeug.exceptions import HTTPException, BadRequest, InternalServerError
 from application.utils import login_required
 from datetime import datetime as dt
 import pandas as pd
@@ -27,9 +27,14 @@ import pandas as pd
 # Create database if does not exist
 db.create_all()
 
-@app.errorhandler(HTTPException)
-def http_error_handler(error):
+@app.errorhandler(Exception)
+def error_handler(error):
+    if not hasattr(error, "name"): # Handle Generic Errors
+        error = InternalServerError
+        error.name = "Internal Server Error"
     return render_template("error.html", error=error, title=f"Rentier | {error.name}"), error.code
+
+
 
 @app.route("/", methods=["GET"])
 def index():
@@ -271,20 +276,33 @@ def api_login_user():
 
 
 @app.route("/api/predict", methods=["POST"])
+@login_required
 def api_predict():  # TODO: Implement input validation
     """
     Api for requesting and returning user predictions based on user input
     """
     data = request.get_json()
-    beds = data["beds"]
-    bathrooms = data["bathrooms"]
-    accomodates = data["accomodates"]
+    beds = int(data["beds"])
+    bathrooms = float(data["bathrooms"])
+    accomodates = int(data["accomodates"])
     minimum_nights = data["minimum_nights"]
     room_type = data["room_type"]
     neighborhood = data["neighborhood"]
     wifi = data["wifi"]
     elevator = data["elevator"]
     pool = data["pool"]
+    assert beds >= 0, "Beds must be greater than or equal to zero"
+    assert bathrooms >= 0, "Bathrooms must be greater than or equal to zero"
+    assert accomodates >= 0, "Accomodates must be greater than zero"
+    assert accomodates >= beds, "Accomodates must be greater than or equal to number of beds"
+    assert minimum_nights >= 0, "MinimumNights must be greater than or equal to zero"
+    assert room_type in ROOM_TYPES, "Room type is invalid"
+    assert neighborhood in NEIGHBORHOODS, "Neighborhood is invalid"
+    assert type(wifi) is bool, "Wifi must be a boolean"
+    assert type(elevator) is bool, "Elevator must be a boolean"
+    assert type(pool) is bool, "Pool must be a boolean"
+
+
     X = pd.DataFrame(
         {
             "beds": [beds],
@@ -302,8 +320,11 @@ def api_predict():  # TODO: Implement input validation
     return jsonify({"prediction": result[0]})
 
 
-@app.route("/api/history/<id>", methods=["POST"])
+@app.route("/api/history/<int:id>", methods=["POST"])
+@login_required
 def api_add_history(id):
+    if session["user_id"] != id:
+        abort(403)
     data = request.get_json()
     beds = data["beds"]
     bathrooms = data["bathrooms"]
@@ -317,8 +338,7 @@ def api_add_history(id):
     actual_price = data["actual_price"]
     link = data["link"]
     prediction = data["prediction"]
-    try:
-        new_entry = Entry(
+    new_entry = Entry(
             beds=beds,
             bathrooms=bathrooms,
             accomodates=accomodates,
@@ -335,14 +355,16 @@ def api_add_history(id):
             user_id=id,
         )
 
-        result = add_entry(new_entry)
-        return jsonify({"result": result})
-    except Exception as e:
-        return jsonify({"result": str(e)})
+    result = add_entry(new_entry)
+    return jsonify({"result": result})
 
 
-@app.route('/api/history/<id>', methods=["GET"])
+
+@app.route('/api/history/<int:id>', methods=["GET"])
+@login_required
 def api_get_user_history(id):
+    if session["user_id"] != id:
+        abort(403)
     entries = get_history(id)
     result = [
         {
@@ -364,8 +386,11 @@ def api_get_user_history(id):
     ]
     return jsonify(result)
     
-@app.route('/api/history/<user_id>/<id>/', methods=["DELETE"])
+@app.route('/api/history/<int:user_id>/<int:id>/', methods=["DELETE"])
+@login_required
 def api_delete_entry(user_id, id):
+    if session["user_id"] != user_id:
+        abort(403)
     result = db.session.query(Entry).filter_by(id=id, user_id=user_id).first()
     if result is None:
         abort(403)
