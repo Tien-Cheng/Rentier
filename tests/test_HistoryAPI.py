@@ -38,7 +38,7 @@ from application import app
             None,  # Actual price
             None,  # Link to listing
             95.09,  # Predicted
-        ],
+        ], # TODO: Add more test cases
     ],
 )
 def test_add_entry(client, entrylist, capsys):
@@ -191,3 +191,40 @@ def test_get_user_history(client, user_history, capsys):
 
 
 # Remove Entry
+@pytest.mark.parametrize("entry_ids", [
+    {
+        "user_id" : 1,
+        "id" : 2
+    },
+    {
+        "user_id" : 2,
+        "id" : 1
+    }
+])
+def test_delete_entry(client, entry_ids, capsys):
+    with capsys.disabled():
+        user_id = entry_ids["user_id"]
+        entry_id = entry_ids["id"]
+        response = client.delete(f"/api/history/{user_id}/{entry_id}/")
+        response_body = json.loads(response.get_data(as_text=True))
+
+        assert response.status_code == 200
+        assert response.headers["Content-Type"] == "application/json"
+
+        assert response_body["result"] == entry_id
+
+
+## Expected Failure: Deleting an entry not related to the user
+@pytest.mark.xfail(reason="Entry does not belong to the user", strict=True)
+@pytest.mark.parametrize("entry_ids", [
+    {
+        "user_id" : 1,
+        "id" : 2
+    },
+    {
+        "user_id" : 2,
+        "id" : 1
+    }
+])
+def test_delete_entry_unauthorized(client, entry_ids, capsys):
+    raise NotImplementedError
