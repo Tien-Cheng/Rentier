@@ -17,7 +17,7 @@ def login_required(func):
         if session.get("user_id") is None:  # Check if user is logged in
             flash("Please login first!", "warning")
             session["next"] = request.url
-            return redirect(url_for("login"))
+            return redirect(url_for("login"), 303) # 303: See Other
         return func(*args, **kwargs)
 
     return decorated_func
