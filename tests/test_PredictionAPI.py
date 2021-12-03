@@ -67,6 +67,53 @@ def test_predict_api(client, entrylist, capsys):
                 abs(float(response_body["difference"])) < 36
             ), "Prediction value is likely to be invalid"
 
+@pytest.mark.xfail(reason="Input parameters are not consistent")
+@pytest.mark.parametrize(
+    "entrylist",
+    [
+        [
+            6,
+            1.5,
+            1, # Swap number of beds with accomodates
+            1,
+            "Entire home/apt",
+            "Kallang",
+            True,
+            True,
+            True,
+            183,
+            "https://www.airbnb.com/rooms/15100514",
+        ],
+        [
+            1,
+            81,
+            1,
+            1, # Swap bathrooms with minimum_nights
+            "Private room",
+            "Novena",
+            True,
+            False,
+            False,
+            115,
+            "https://www.airbnb.com/rooms/45149222",
+        ],
+        [
+            1,
+            1,
+            1,
+            81, 
+            "Private room",
+            "Novena",
+            False,
+            True, # Swap elevator with wifi
+            False,
+            115,
+            "https://www.airbnb.com/rooms/45149222",
+        ],
+    ],
+)
+def test_predict_consistency(client, entrylist, capsys):
+    test_predict_api(client, entrylist, capsys)
 
 @pytest.mark.xfail(reason="Inputs out of range", strict=True)
 @pytest.mark.usefixtures("fake_login")
@@ -156,4 +203,4 @@ def test_predict_api(client, entrylist, capsys):
 def test_predict_api_rangetests(client, entrylist, capsys):
     test_predict_api(
         client, entrylist, capsys
-    )  # TODO: not working properly rn -> it api_predict needs to validate the input
+    ) 

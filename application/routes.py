@@ -27,18 +27,24 @@ import pandas as pd
 # Create database if does not exist
 db.create_all()
 
+
 @app.errorhandler(Exception)
 def error_handler(error):
-    if not hasattr(error, "name") or not hasattr(error, "code"): # Handle Generic Errors
+    if not hasattr(error, "name") or not hasattr(
+        error, "code"
+    ):  # Handle Generic Errors
         error = InternalServerError
         error.name = "Internal Server Error"
-    return render_template("error.html", error=error, title=f"Rentier | {error.name}"), error.code
+    return (
+        render_template("error.html", error=error, title=f"Rentier | {error.name}"),
+        error.code,
+    )
+
 
 @app.errorhandler(API_Error)
 def api_error_handler(error):
-    return jsonify({
-        "message" : error.message
-    }), error.status_code
+    return jsonify({"message": error.message}), error.status_code
+
 
 @app.route("/", methods=["GET"])
 def index():
@@ -76,14 +82,22 @@ def predict():
                 assert beds >= 0, "Beds must be greater than or equal to zero"
                 assert bathrooms >= 0, "Bathrooms must be greater than or equal to zero"
                 assert accomodates >= 0, "Accomodates must be greater than zero"
-                assert accomodates >= beds, "Accomodates must be greater than or equal to number of beds"
-                assert minimum_nights >= 0, "MinimumNights must be greater than or equal to zero"
+                assert (
+                    accomodates >= beds
+                ), "Accomodates must be greater than or equal to number of beds"
+                assert (
+                    minimum_nights >= 0
+                ), "MinimumNights must be greater than or equal to zero"
                 assert room_type in ROOM_TYPES, "Room type is invalid"
                 assert neighborhood in NEIGHBORHOODS, "Neighborhood is invalid"
                 assert type(wifi) is bool, "Wifi must be a boolean"
                 assert type(elevator) is bool, "Elevator must be a boolean"
                 assert type(pool) is bool, "Pool must be a boolean"
-                assert type(actual_price) in {type(None), float, int}, "Actual price should be a number or None"
+                assert type(actual_price) in {
+                    type(None),
+                    float,
+                    int,
+                }, "Actual price should be a number or None"
                 if actual_price is not None:
                     assert actual_price > 0, "Actual price should be greater than 0"
             except:
@@ -126,12 +140,12 @@ def predict():
                 prediction=float(result[0]),
                 created=dt.utcnow(),
                 user_id=session["user_id"],
-                difference=difference
+                difference=difference,
             )
             add_entry(new_entry)
     except BadRequest:
         flash(f"Input validation failed. Please try again!", "danger")
-    
+
     return render_template(
         "predict.html",
         form=pred_form,
@@ -151,9 +165,15 @@ def history():
     per_page = int(request.args.get("per_page", 5))
     col_sort = request.args.get("col_sort", "created")
     desc = request.args.get("dir", "desc") == "desc"
-    print(desc)
     history = get_history(session["user_id"], page, per_page, col_sort, desc)
-    return render_template("history.html", title="Rentier | History", history=history, col_sort=col_sort, desc=desc)
+    return render_template(
+        "history.html",
+        title="Rentier | History",
+        history=history,
+        col_sort=col_sort,
+        desc=desc,
+        per_page=per_page,
+    )
 
 
 @app.route("/delete", methods=["POST"])
@@ -170,6 +190,7 @@ def delete():
     else:
         delete_entry(result)
     return redirect(url_for("history"))
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -240,7 +261,7 @@ def logout():
     """
     # remove user from session
     session.pop("user_id", None)
-    flash("Logged Out", "warning")
+    flash("Logged Out", "success")
     return redirect(url_for("index"))
 
 
@@ -253,7 +274,9 @@ def api_add_user():
         # Get json file posted from client
         data = request.get_json()
         if data is None:
-            raise TypeError("Invalid request type. Ensure data is in the form of a json file.")
+            raise TypeError(
+                "Invalid request type. Ensure data is in the form of a json file."
+            )
         # Retrieve fields from data
         email = data["email"]
         password_hash = generate_password_hash(data["password"])
@@ -264,7 +287,7 @@ def api_add_user():
         # Add entry to user table
         result = add_user(new_user)
     except Exception as e:
-        raise API_Error(' '.join(e.args), 400)
+        raise API_Error(" ".join(e.args), 400)
     return jsonify(
         {
             "id": result,
@@ -282,7 +305,9 @@ def api_login_user():
     """
     data = request.get_json()
     if data is None:
-        raise TypeError("Invalid request type. Ensure data is in the form of a json file.")
+        raise TypeError(
+            "Invalid request type. Ensure data is in the form of a json file."
+        )
     email = data["email"]
     password = data["password"]
     remember_me = data["remember_me"]
@@ -316,7 +341,9 @@ def api_predict():  # TODO: Implement input validation
     try:
         data = request.get_json()
         if data is None:
-            raise TypeError("Invalid request type. Ensure data is in the form of a json file.")
+            raise TypeError(
+                "Invalid request type. Ensure data is in the form of a json file."
+            )
         beds = int(data["beds"])
         bathrooms = float(data["bathrooms"])
         accomodates = int(data["accomodates"])
@@ -330,18 +357,26 @@ def api_predict():  # TODO: Implement input validation
         assert beds >= 0, "Beds must be greater than or equal to zero"
         assert bathrooms >= 0, "Bathrooms must be greater than or equal to zero"
         assert accomodates >= 0, "Accomodates must be greater than zero"
-        assert accomodates >= beds, "Accomodates must be greater than or equal to number of beds"
-        assert minimum_nights >= 0, "MinimumNights must be greater than or equal to zero"
+        assert (
+            accomodates >= beds
+        ), "Accomodates must be greater than or equal to number of beds"
+        assert (
+            minimum_nights >= 0
+        ), "MinimumNights must be greater than or equal to zero"
         assert room_type in ROOM_TYPES, "Room type is invalid"
         assert neighborhood in NEIGHBORHOODS, "Neighborhood is invalid"
         assert type(wifi) is bool, "Wifi must be a boolean"
         assert type(elevator) is bool, "Elevator must be a boolean"
         assert type(pool) is bool, "Pool must be a boolean"
-        assert type(actual_price) in {type(None), float, int}, "Actual price should be a number or None"
+        assert type(actual_price) in {
+            type(None),
+            float,
+            int,
+        }, "Actual price should be a number or None"
         if actual_price is not None:
             assert actual_price > 0, "Actual price should be greater than 0"
     except Exception as e:
-        raise API_Error(' '.join(e.args), 400)
+        raise API_Error(" ".join(e.args), 400)
 
     X = pd.DataFrame(
         {
@@ -361,7 +396,7 @@ def api_predict():  # TODO: Implement input validation
         difference = actual_price - result[0]
     else:
         difference = None
-    return jsonify({"prediction": result[0], "difference" : difference })
+    return jsonify({"prediction": result[0], "difference": difference})
 
 
 @app.route("/api/history/<int:id>", methods=["POST"])
@@ -371,7 +406,9 @@ def api_add_history(id):
         raise API_Error("Your user id does not match up with the request.", 403)
     data = request.get_json()
     if data is None:
-        raise TypeError("Invalid request type. Ensure data is in the form of a json file.")
+        raise TypeError(
+            "Invalid request type. Ensure data is in the form of a json file."
+        )
     beds = data["beds"]
     bathrooms = data["bathrooms"]
     accomodates = data["accomodates"]
@@ -387,30 +424,32 @@ def api_add_history(id):
     difference = data["difference"]
     try:
         new_entry = Entry(
-                beds=beds,
-                bathrooms=bathrooms,
-                accomodates=accomodates,
-                minimum_nights=minimum_nights,
-                room_type=room_type,
-                neighborhood=neighborhood,
-                wifi=wifi,
-                elevator=elevator,
-                pool=pool,
-                actual_price=actual_price,
-                link=link,
-                prediction=float(prediction),
-                created=dt.utcnow(),
-                user_id=id,
-                difference=difference
-            )
+            beds=beds,
+            bathrooms=bathrooms,
+            accomodates=accomodates,
+            minimum_nights=minimum_nights,
+            room_type=room_type,
+            neighborhood=neighborhood,
+            wifi=wifi,
+            elevator=elevator,
+            pool=pool,
+            actual_price=actual_price,
+            link=link,
+            prediction=float(prediction),
+            created=dt.utcnow(),
+            user_id=id,
+            difference=difference,
+        )
         result = add_entry(new_entry)
     except Exception as e:
-        raise API_Error(' '.join(e.args), 400)
+        raise API_Error(" ".join(e.args), 400)
     return jsonify({"result": result})
+
 
 AssertionError()
 
-@app.route('/api/history/<int:id>', methods=["GET"])
+
+@app.route("/api/history/<int:id>", methods=["GET"])
 @login_required
 def api_get_user_history(id):
     if session["user_id"] != id:
@@ -418,26 +457,29 @@ def api_get_user_history(id):
     entries = get_history(id)
     result = [
         {
-           "user_id" : entry.user_id,
-           "beds" : entry.beds,
-           "bathrooms" : entry.bathrooms,
-           "accomodates" : entry.accomodates,
-           "minimum_nights" : entry.minimum_nights,
-           "room_type" : entry.room_type,
-           "neighborhood" : entry.neighborhood,
-           "wifi" : entry.wifi,
-           "elevator" : entry.elevator,
-           "pool" : entry.pool,
-           "actual_price" : entry.actual_price,
-           "link" : entry.link,
-           "prediction" : entry.prediction,
-           "created" : entry.created,
-           "difference" : entry.difference,
-        } for entry in entries
+            "entry_id": entry.id,
+            "user_id": entry.user_id,
+            "beds": entry.beds,
+            "bathrooms": entry.bathrooms,
+            "accomodates": entry.accomodates,
+            "minimum_nights": entry.minimum_nights,
+            "room_type": entry.room_type,
+            "neighborhood": entry.neighborhood,
+            "wifi": entry.wifi,
+            "elevator": entry.elevator,
+            "pool": entry.pool,
+            "actual_price": entry.actual_price,
+            "link": entry.link,
+            "prediction": entry.prediction,
+            "created": entry.created,
+            "difference": entry.difference,
+        }
+        for entry in entries
     ]
     return jsonify(result)
-    
-@app.route('/api/history/<int:user_id>/<int:id>/', methods=["DELETE"])
+
+
+@app.route("/api/history/<int:user_id>/<int:id>/", methods=["DELETE"])
 @login_required
 def api_delete_entry(user_id, id):
     if session["user_id"] != user_id:
@@ -446,6 +488,4 @@ def api_delete_entry(user_id, id):
     if result is None:
         raise API_Error("Entry could not be found", 404)
     result = delete_entry(result)
-    return jsonify({
-        "result" : result
-    })
+    return jsonify({"result": result})

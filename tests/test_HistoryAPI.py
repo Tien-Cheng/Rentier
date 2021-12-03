@@ -10,39 +10,47 @@ from application import app
 @pytest.mark.parametrize(
     "entrylist, fake_login",
     [
-        ([
-            2,  # User ID
-            3,  # Beds
-            1,  # Bathrooms
-            6,  # Accomodates
-            90,  # Minimum Nights
-            "Private room",  # Room type
-            "Tampines",  # Neighborhood
-            True,  # Wifi
-            False,  # Elevator
-            False,  # Pool
-            178,  # Actual price
-            "https://www.airbnb.com/rooms/71609",  # Link to listing
-            155.06,  # Predicted
-            178 - 155.06
-        ], 2),
-        ([
-            1,  # User ID
-            2,  # Beds
-            1,  # Bathrooms
-            3,  # Accomodates
-            90,  # Minimum Nights
-            "Shared room",  # Room type
-            "Marine Parade",  # Neighborhood
-            True,  # Wifi
-            True,  # Elevator
-            False,  # Pool
-            None,  # Actual price
-            None,  # Link to listing
-            95.09,  # Predicted
-            None
-        ], 1), 
-    ], indirect=["fake_login"])
+        (
+            [
+                2,  # User ID
+                3,  # Beds
+                1,  # Bathrooms
+                6,  # Accomodates
+                90,  # Minimum Nights
+                "Private room",  # Room type
+                "Tampines",  # Neighborhood
+                True,  # Wifi
+                False,  # Elevator
+                False,  # Pool
+                178,  # Actual price
+                "https://www.airbnb.com/rooms/71609",  # Link to listing
+                155.06,  # Predicted
+                178 - 155.06,
+            ],
+            2,
+        ),
+        (
+            [
+                1,  # User ID
+                2,  # Beds
+                1,  # Bathrooms
+                3,  # Accomodates
+                90,  # Minimum Nights
+                "Shared room",  # Room type
+                "Marine Parade",  # Neighborhood
+                True,  # Wifi
+                True,  # Elevator
+                False,  # Pool
+                None,  # Actual price
+                None,  # Link to listing
+                95.09,  # Predicted
+                None,
+            ],
+            1,
+        ),
+    ],
+    indirect=["fake_login"],
+)
 def test_add_entry(client, entrylist, capsys):
     with capsys.disabled():
         with client:
@@ -59,7 +67,7 @@ def test_add_entry(client, entrylist, capsys):
                 actual_price=entrylist[10],
                 link=entrylist[11],
                 prediction=entrylist[12],
-                difference =entrylist[13],
+                difference=entrylist[13],
             )
 
             response = client.post(
@@ -86,39 +94,46 @@ def test_add_entry(client, entrylist, capsys):
 @pytest.mark.parametrize(
     "entrylist, fake_login",
     [
-        ([
-            -1,  # User_id
-            2,  # Beds
-            1,  # Bathrooms
-            2,  # Accomodates
-            7,  # Minimum Nights
-            "Private room",  # Room type
-            "Ang Mo Kio",  # Neighborhood
-            True,  # Wifi
-            True,  # Elevator
-            False,  # Pool
-            None,  # Actual Price
-            None,  # Link
-            94.0,  # Prediction
-            None
-        ], -1),
-        ([
+        (
+            [
+                -1,  # User_id
+                2,  # Beds
+                1,  # Bathrooms
+                2,  # Accomodates
+                7,  # Minimum Nights
+                "Private room",  # Room type
+                "Ang Mo Kio",  # Neighborhood
+                True,  # Wifi
+                True,  # Elevator
+                False,  # Pool
+                None,  # Actual Price
+                None,  # Link
+                94.0,  # Prediction
+                None,
+            ],
+            -1,
+        ),
+        (
+            [
+                545,
+                1,
+                1,
+                2,
+                90,
+                "Private room",
+                "Bukit Timah",
+                True,
+                True,
+                True,
+                80,
+                "https://www.airbnb.com/rooms/71896",
+                70.83,
+                80 - 70.83,
+            ],
             545,
-            1,
-            1,
-            2,
-            90,
-            "Private room",
-            "Bukit Timah",
-            True,
-            True,
-            True,
-            80,
-            "https://www.airbnb.com/rooms/71896",
-            70.83,
-            80 - 70.83,
-        ], 545),
-    ], indirect=["fake_login"]
+        ),
+    ],
+    indirect=["fake_login"],
 )
 def test_add_entry_invalid_user_id(client, entrylist, capsys):
     test_add_entry(client, entrylist, capsys)
@@ -132,47 +147,56 @@ def test_add_entry_invalid_user_id(client, entrylist, capsys):
 @pytest.mark.parametrize(
     "user_history, fake_login",
     [
-        ({
-            "user_id": 2,
-            "history": [
-                {
-                    "beds": 3,
-                    "bathrooms": 1,
-                    "accomodates": 6,
-                    "minimum_nights": 90,
-                    "room_type": "Private room",
-                    "neighborhood": "Tampines",
-                    "wifi": True,
-                    "elevator": False,
-                    "pool": False,
-                    "actual_price": 178,
-                    "link": "https://www.airbnb.com/rooms/71609",
-                    "prediction": 155.06,
-                    "difference" : 178 - 155.06
-                }
-            ],
-        }, 2),
-        ({
-            "user_id": 1,
-            "history": [
-                {
-                    "beds": 2,
-                    "bathrooms": 1,
-                    "accomodates": 3,
-                    "minimum_nights": 90,
-                    "room_type": "Shared room",
-                    "neighborhood": "Marine Parade",
-                    "wifi": True,
-                    "elevator": True,
-                    "pool": False,
-                    "actual_price": None,
-                    "link": None,
-                    "prediction": 95.09,
-                    "difference" : None
-                }
-            ],
-        }, 1),
-    ], indirect=["fake_login"]
+        (
+            {
+                "user_id": 2,
+                "history": [
+                    {
+                        "entry_id": 1,
+                        "beds": 3,
+                        "bathrooms": 1,
+                        "accomodates": 6,
+                        "minimum_nights": 90,
+                        "room_type": "Private room",
+                        "neighborhood": "Tampines",
+                        "wifi": True,
+                        "elevator": False,
+                        "pool": False,
+                        "actual_price": 178,
+                        "link": "https://www.airbnb.com/rooms/71609",
+                        "prediction": 155.06,
+                        "difference": 178 - 155.06,
+                    }
+                ],
+            },
+            2,
+        ),
+        (
+            {
+                "user_id": 1,
+                "history": [
+                    {
+                        "entry_id": 2,
+                        "beds": 2,
+                        "bathrooms": 1,
+                        "accomodates": 3,
+                        "minimum_nights": 90,
+                        "room_type": "Shared room",
+                        "neighborhood": "Marine Parade",
+                        "wifi": True,
+                        "elevator": True,
+                        "pool": False,
+                        "actual_price": None,
+                        "link": None,
+                        "prediction": 95.09,
+                        "difference": None,
+                    }
+                ],
+            },
+            1,
+        ),
+    ],
+    indirect=["fake_login"],
 )
 def test_get_user_history(client, user_history, capsys):
     with capsys.disabled():
@@ -203,16 +227,11 @@ def test_get_user_history(client, user_history, capsys):
 
 # Remove Entry
 @pytest.mark.usefixtures("fake_login")
-@pytest.mark.parametrize("entry_ids, fake_login", [
-    ({
-        "user_id" : 1,
-        "id" : 2
-    }, 1),
-    ({
-        "user_id" : 2,
-        "id" : 1
-    }, 2)
-], indirect=["fake_login"])
+@pytest.mark.parametrize(
+    "entry_ids, fake_login",
+    [({"user_id": 1, "id": 2}, 1), ({"user_id": 2, "id": 1}, 2)],
+    indirect=["fake_login"],
+)
 def test_delete_entry(client, entry_ids, capsys):
     with capsys.disabled():
         with client:
@@ -230,15 +249,10 @@ def test_delete_entry(client, entry_ids, capsys):
 ## Expected Failure: Deleting an entry not related to the user
 @pytest.mark.xfail(reason="Entry does not belong to the user", strict=True)
 @pytest.mark.usefixtures("fake_login")
-@pytest.mark.parametrize("entry_ids, fake_login", [
-    ({
-        "user_id" : 1,
-        "id" : 2
-    }, 1),
-    ({
-        "user_id" : 2,
-        "id" : 1
-    }, 2)
-], indirect=["fake_login"])
+@pytest.mark.parametrize(
+    "entry_ids, fake_login",
+    [({"user_id": 1, "id": 2}, 1), ({"user_id": 2, "id": 1}, 2)],
+    indirect=["fake_login"],
+)
 def test_delete_entry_unauthorized(client, entry_ids, capsys):
     test_delete_entry(client, entry_ids, capsys)
