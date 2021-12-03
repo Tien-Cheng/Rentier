@@ -88,6 +88,13 @@ def test_user_login_api(client, userlist, capsys):
             assert session.permanent == response_body["remember_me"]
             assert session["user_id"] == response_body["id"]
 
+@pytest.mark.xfail(reason="Invalid login credentials")
+@pytest.mark.parametrize("userlist", [
+    ["invalid_email@example.com", "Password1234!", False],
+    ["user_1@example.com", "Password5678egWrong", False]
+])
+def test_user_fail_login_api(client, userlist, capsys):
+    test_user_login_api(client, userlist, capsys)
 
 @pytest.mark.usefixtures("fake_login")
 @pytest.mark.parametrize("fake_login", [1], indirect=True)

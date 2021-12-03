@@ -23,8 +23,8 @@ import pytest
             True,  # Wifi
             True,  # Elevator
             False,  # Pool
-            None,  # Actual Price
-            None,  # Link
+            None,  # Actual Price --> Optional Params
+            None,  # Link --> Optional Params
             94,  # Prediction
             None, # Difference
         ],
@@ -40,7 +40,7 @@ import pytest
             True,
             True,
             80,
-            "https://www.airbnb.com/rooms/71896",  # Test optional
+            "https://www.airbnb.com/rooms/71896", 
             70.83,
             80 - 70.83 # Difference
         ],
