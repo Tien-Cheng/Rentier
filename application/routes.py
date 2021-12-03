@@ -240,7 +240,7 @@ def logout():
     """
     # remove user from session
     session.pop("user_id", None)
-    flash("Logged Out", "warning")
+    flash("Logged Out", "success")
     return redirect(url_for("index"))
 
 
