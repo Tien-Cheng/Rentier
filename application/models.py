@@ -3,7 +3,7 @@ import datetime as dt
 import re
 from flask import flash, abort
 from sqlalchemy.orm import validates
-
+from sqlalchemy.sql.expression import column
 from sqlalchemy.exc import IntegrityError
 
 
@@ -141,9 +141,14 @@ def delete_entry(entry):
         abort(500)
 
 
-def get_history(user_id, page=None, per_page=5):
+def get_history(user_id, page=None, per_page=5, order_by="created", desc=True):
     try:
-        results = db.session.query(Entry).filter_by(user_id=user_id)
+        order_by = column(order_by)
+        if desc:
+            order_by = order_by.desc()
+        else:
+            order_by = order_by.asc()
+        results = db.session.query(Entry).filter_by(user_id=user_id).order_by(order_by)
         if page is None:
             return results.all()
         else:

@@ -29,7 +29,7 @@ db.create_all()
 
 @app.errorhandler(Exception)
 def error_handler(error):
-    if not hasattr(error, "name"): # Handle Generic Errors
+    if not hasattr(error, "name") or not hasattr(error, "code"): # Handle Generic Errors
         error = InternalServerError
         error.name = "Internal Server Error"
     return render_template("error.html", error=error, title=f"Rentier | {error.name}"), error.code
@@ -143,8 +143,11 @@ def history():
     """
     page = int(request.args.get("page", 1))
     per_page = int(request.args.get("per_page", 5))
-    history = get_history(session["user_id"], page, per_page)
-    return render_template("history.html", title="Rentier | History", history=history)
+    col_sort = request.args.get("col_sort", "created")
+    desc = request.args.get("dir", "desc") == "desc"
+    print(desc)
+    history = get_history(session["user_id"], page, per_page, col_sort, desc)
+    return render_template("history.html", title="Rentier | History", history=history, col_sort=col_sort, desc=desc)
 
 
 @app.route("/delete", methods=["POST"])
