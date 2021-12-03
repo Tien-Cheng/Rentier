@@ -3,7 +3,7 @@ import datetime as dt
 import re
 from flask import flash, abort
 from sqlalchemy.orm import validates
-
+from sqlalchemy.sql.expression import column
 from sqlalchemy.exc import IntegrityError
 
 
@@ -28,6 +28,7 @@ class Entry(db.Model):
     actual_price = db.Column(db.Float, nullable=True)
     link = db.Column(db.String(500), nullable=True)
     prediction = db.Column(db.Float, nullable=False)
+    difference = db.Column(db.Float, nullable=True)
     created = db.Column(db.DateTime, nullable=False)
 
     @validates("beds")
@@ -101,8 +102,8 @@ class Entry(db.Model):
         }, "Either actual price should be None, int or float"
         if actual_price is not None:
             assert (
-                actual_price >= 0
-            ), "Actual price should be greater than or equal to 0"
+                actual_price > 0
+            ), "Actual price should be greater than 0"
         return actual_price
 
     @validates("prediction")
@@ -121,6 +122,10 @@ class Entry(db.Model):
         assert type(link) in {type(None), str}, "Link should be None or Str"
         return link
 
+    @validates("difference")
+    def validates_difference(self, key, difference):
+        assert type(difference) in {int, float, type(None)}, "Difference should be a number or None"
+        return difference
 
 def add_entry(entry):
     try:
@@ -141,9 +146,18 @@ def delete_entry(entry):
         abort(500)
 
 
-def get_history(user_id):
+def get_history(user_id, page=None, per_page=5, order_by="created", desc=True):
     try:
-        return db.session.query(Entry).filter_by(user_id=user_id).all()
+        order_by = column(order_by)
+        if desc:
+            order_by = order_by.desc()
+        else:
+            order_by = order_by.asc()
+        results = db.session.query(Entry).filter_by(user_id=user_id).order_by(order_by)
+        if page is None:
+            return results.all()
+        else:
+            return results.paginate(page=page, per_page=per_page) 
     except Exception as error:
         flash(str(error), "danger")
         abort(500)

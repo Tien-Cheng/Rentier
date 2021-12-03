@@ -47,7 +47,10 @@ def test_predict_api(client, entrylist, capsys):
             "elevator": entrylist[7],
             "pool": entrylist[8],
         }
-        
+        if len(entrylist) > 9:
+            data["actual_price"] = entrylist[9]
+        else:
+            data["actual_price"] = None
         response = client.post(
             "/api/predict", data=json.dumps(data), content_type="application/json"
         )
@@ -59,9 +62,9 @@ def test_predict_api(client, entrylist, capsys):
         # Check that prediction result is reasonable
         pred = float(response_body["prediction"])
         assert pred > 0, "Predicted value should be greater than 0"
-        if len(entrylist) == 11:
+        if data["actual_price"] is not None:
             assert (
-                abs(float(entrylist[-2]) - pred) < 36
+                abs(float(response_body["difference"])) < 36
             ), "Prediction value is likely to be invalid"
 
 

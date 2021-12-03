@@ -29,7 +29,7 @@ db.create_all()
 
 @app.errorhandler(Exception)
 def error_handler(error):
-    if not hasattr(error, "name"): # Handle Generic Errors
+    if not hasattr(error, "name") or not hasattr(error, "code"): # Handle Generic Errors
         error = InternalServerError
         error.name = "Internal Server Error"
     return render_template("error.html", error=error, title=f"Rentier | {error.name}"), error.code
@@ -83,6 +83,9 @@ def predict():
                 assert type(wifi) is bool, "Wifi must be a boolean"
                 assert type(elevator) is bool, "Elevator must be a boolean"
                 assert type(pool) is bool, "Pool must be a boolean"
+                assert type(actual_price) in {type(None), float, int}, "Actual price should be a number or None"
+                if actual_price is not None:
+                    assert actual_price > 0, "Actual price should be greater than 0"
             except:
                 raise BadRequest
             entry_params = pd.DataFrame(
@@ -101,8 +104,10 @@ def predict():
             result = ai_model.predict(entry_params)
             show_result = True
             results = {"price": result[0], "actual_price": actual_price}
+            difference = None
             if actual_price is not None:
-                results["price_diff"] = abs(actual_price - result[0])
+                difference = float(actual_price - result[0])
+                results["price_diff"] = abs(difference)
                 results["same"] = (
                     results["price_diff"] < 0.05
                 )  # account for floating point inprecision
@@ -121,6 +126,7 @@ def predict():
                 prediction=float(result[0]),
                 created=dt.utcnow(),
                 user_id=session["user_id"],
+                difference=difference
             )
             add_entry(new_entry)
     except BadRequest:
@@ -141,8 +147,13 @@ def history():
     """
     Return history page, containing the specific history of a user
     """
-    history = get_history(session["user_id"])
-    return render_template("history.html", title="Rentier | History", history=history)
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 5))
+    col_sort = request.args.get("col_sort", "created")
+    desc = request.args.get("dir", "desc") == "desc"
+    print(desc)
+    history = get_history(session["user_id"], page, per_page, col_sort, desc)
+    return render_template("history.html", title="Rentier | History", history=history, col_sort=col_sort, desc=desc)
 
 
 @app.route("/delete", methods=["POST"])
@@ -315,6 +326,7 @@ def api_predict():  # TODO: Implement input validation
         wifi = data["wifi"]
         elevator = data["elevator"]
         pool = data["pool"]
+        actual_price = data["actual_price"]
         assert beds >= 0, "Beds must be greater than or equal to zero"
         assert bathrooms >= 0, "Bathrooms must be greater than or equal to zero"
         assert accomodates >= 0, "Accomodates must be greater than zero"
@@ -325,6 +337,9 @@ def api_predict():  # TODO: Implement input validation
         assert type(wifi) is bool, "Wifi must be a boolean"
         assert type(elevator) is bool, "Elevator must be a boolean"
         assert type(pool) is bool, "Pool must be a boolean"
+        assert type(actual_price) in {type(None), float, int}, "Actual price should be a number or None"
+        if actual_price is not None:
+            assert actual_price > 0, "Actual price should be greater than 0"
     except Exception as e:
         raise API_Error(' '.join(e.args), 400)
 
@@ -342,7 +357,11 @@ def api_predict():  # TODO: Implement input validation
         }
     )
     result = ai_model.predict(X)
-    return jsonify({"prediction": result[0]})
+    if actual_price is not None:
+        difference = actual_price - result[0]
+    else:
+        difference = None
+    return jsonify({"prediction": result[0], "difference" : difference })
 
 
 @app.route("/api/history/<int:id>", methods=["POST"])
@@ -365,6 +384,7 @@ def api_add_history(id):
     actual_price = data["actual_price"]
     link = data["link"]
     prediction = data["prediction"]
+    difference = data["difference"]
     try:
         new_entry = Entry(
                 beds=beds,
@@ -381,11 +401,11 @@ def api_add_history(id):
                 prediction=float(prediction),
                 created=dt.utcnow(),
                 user_id=id,
+                difference=difference
             )
+        result = add_entry(new_entry)
     except Exception as e:
         raise API_Error(' '.join(e.args), 400)
-
-    result = add_entry(new_entry)
     return jsonify({"result": result})
 
 AssertionError()
@@ -411,7 +431,8 @@ def api_get_user_history(id):
            "actual_price" : entry.actual_price,
            "link" : entry.link,
            "prediction" : entry.prediction,
-           "created" : entry.created
+           "created" : entry.created,
+           "difference" : entry.difference,
         } for entry in entries
     ]
     return jsonify(result)

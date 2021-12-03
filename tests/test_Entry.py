@@ -26,6 +26,7 @@ import pytest
             None,  # Actual Price
             None,  # Link
             94,  # Prediction
+            None, # Difference
         ],
         [
             1,
@@ -41,6 +42,7 @@ import pytest
             80,
             "https://www.airbnb.com/rooms/71896",  # Test optional
             70.83,
+            80 - 70.83 # Difference
         ],
     ],
 )
@@ -63,6 +65,7 @@ def test_EntryClass(entrylist, capsys):
             actual_price=entrylist[10],
             link=entrylist[11],
             prediction=entrylist[12],
+            difference=entrylist[13],
             created=created,
         )
 
@@ -80,6 +83,7 @@ def test_EntryClass(entrylist, capsys):
         assert new_entry.actual_price == entrylist[10]
         assert new_entry.link == entrylist[11]
         assert new_entry.prediction == entrylist[12]
+        assert new_entry.difference == entrylist[13]
         assert new_entry.created == created
 
 
@@ -109,6 +113,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -124,6 +129,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -139,6 +145,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -154,6 +161,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -169,6 +177,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -184,6 +193,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -199,6 +209,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -214,6 +225,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -229,6 +241,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -244,6 +257,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             70,
+            None
         ],
         [
             1,
@@ -259,6 +273,7 @@ def test_EntryClass(entrylist, capsys):
             "70",  # Must be None or Float
             None,
             70,
+            None
         ],
         [
             1,
@@ -274,6 +289,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             54,  # Must be string or None
             70,
+            None
         ],
         [
             1,
@@ -289,6 +305,7 @@ def test_EntryClass(entrylist, capsys):
             None,
             None,
             None,  # Cannot be None
+            None
         ],
     ],
 )
@@ -335,6 +352,7 @@ def test_EntryValidation_InvalidDataType(entrylist, capsys):
                 80,
                 "https://www.airbnb.com/rooms/71896",  # Test optional
                 70.83,
+                80 - 70.83
             ],
             [
                 1,
@@ -351,6 +369,7 @@ def test_EntryValidation_InvalidDataType(entrylist, capsys):
                 80,
                 "https://www.airbnb.com/rooms/71896",  # Test optional
                 70.83,
+                80 - 70.83
             ],
             [
                 1,
@@ -367,6 +386,7 @@ def test_EntryValidation_InvalidDataType(entrylist, capsys):
                 80,
                 "https://www.airbnb.com/rooms/71896",  # Test optional
                 70.83,
+                80 - 70.83
             ],
             [
                 1,
@@ -383,6 +403,7 @@ def test_EntryValidation_InvalidDataType(entrylist, capsys):
                 80,
                 "https://www.airbnb.com/rooms/71896",  # Test optional
                 70.83,
+                80 - 70.83
             ],
             [
                 1,
@@ -399,6 +420,7 @@ def test_EntryValidation_InvalidDataType(entrylist, capsys):
                 80,
                 "https://www.airbnb.com/rooms/71896",  # Test optional
                 70.83,
+                80 - 70.83
             ],
             [
                 1,
@@ -415,6 +437,7 @@ def test_EntryValidation_InvalidDataType(entrylist, capsys):
                 80,
                 "https://www.airbnb.com/rooms/71896",
                 70.83,
+                80 - 70.83
             ],
             [
                 1,
@@ -431,6 +454,7 @@ def test_EntryValidation_InvalidDataType(entrylist, capsys):
                 -100,  # Actual price cannot be negative
                 "https://www.airbnb.com/rooms/71896",
                 70.83,
+                80 - 70.83
             ],
             [
                 1,
@@ -447,6 +471,7 @@ def test_EntryValidation_InvalidDataType(entrylist, capsys):
                 100,
                 "https://www.airbnb.com/rooms/71896",
                 -431,  # Predicted price cannot be negative
+                100 + 431
             ],
         ]
     ],
@@ -473,6 +498,7 @@ def test_EntryValidation_RangeTest(entrylist, capsys):
             100,
             "https://www.airbnb.com/rooms/71896",
             431,
+            100 - 431
         ],
         [
             1,
@@ -489,6 +515,7 @@ def test_EntryValidation_RangeTest(entrylist, capsys):
             100,
             "https://www.airbnb.com/rooms/71896",
             None,  # cannot be None (missing)
+            None
         ],
     ],
 )

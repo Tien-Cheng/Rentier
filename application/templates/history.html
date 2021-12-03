@@ -7,11 +7,35 @@
         between different listings.</p>
 </div>
 {% if history %}
-<div class="table-responsive my-3">
+<div class="dropdown text-end">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="history-sort-toggle" data-bs-toggle="dropdown"
+        aria-expanded="false">
+        Sort by
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="history-sort-toggle">
+        {% for column in history.query.statement.columns.keys() %}
+        {% if column not in ["user_id", "id"] %}
+        <li>
+            <a class="dropdown-item {% if column == col_sort %}active{% endif %}"
+                href="{{ url_for('history', page=history.page, col_sort=column, dir='asc' if column == col_sort and desc else 'desc') }}">
+                {{ column | replace("_", " ")|title }}
+                {% if  (desc and column == col_sort) or (column != col_sort)  %}
+                        &#8595;
+                    {% else %}
+                        &#8593;
+                    {% endif %}
+            </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+<div class="table-responsive my-2">
     <table class="table table-hover text-center">
         <thead class="table-dark">
             <tr>
-                <th scope="col">#</th>
+                <!-- <th scope="col">#</th> -->
+                <th scope="col">Created</th>
                 <th scope="col">Beds</th>
                 <th scope="col">Bathrooms</th>
                 <th scope="col">Accomodates</th>
@@ -21,30 +45,16 @@
                 <th scope="col">Wifi?</th>
                 <th scope="col">Elevator?</th>
                 <th scope="col">Pool?</th>
-                <th scope="col">Predicted</th>
-                <th scope="col">Actual</th>
-                <th scope="col">Difference</th>
+                <th scope="col">Predicted (USD)</th>
+                <th scope="col">Actual (USD)</th>
+                <th scope="col">Difference (USD)</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>
         <tbody>
-            <!-- <tr>
-            <td>Example Row</td>
-            <td>1</td>
-            <td>1</td>
-            <td>2</td>
-            <td>Shared Room</td>
-            <td>Toa Payoh</td>
-            <td>Yes</td>
-            <td>No</td>
-            <td>$80</td>
-            <td>$90</td>
-            <td>-$10</td>
-            <td>❌ &nbsp; 🔎</td>
-        </tr> -->
-            {% for entry in history %}
+            {% for entry in history.items %}
             <tr>
-                <td>{{ loop.index }}</td>
+                <td>{{ entry.created | render_date(format="%d/%m/%Y %H:%M") }}</td>
                 <td>{{ entry.beds }}</td>
                 <td>{{ entry.bathrooms }}</td>
                 <td>{{ entry.accomodates }}</td>
@@ -55,20 +65,24 @@
                 <td>{{ entry.elevator }}</td>
                 <td>{{ entry.pool }}</td>
                 <td>${{ entry.prediction | round(precision=2) }}</td>
-                <td>{% if entry.actual_price %} ${{ entry.actual_price | round(precision=2) }} {% else %} N/A {% endif %}</td>
-                <td>{% if entry.actual_price %} ${{ (entry.actual_price - entry.prediction) | round(precision=2) }} {% else %} N/A {% endif %}
+                <td>{% if entry.actual_price %} ${{ entry.actual_price | round(precision=2) }} {% else %} N/A {% endif
+                    %}</td>
+                <td>{% if entry.actual_price %} {{ (entry.actual_price - entry.prediction) | round(precision=2) }} {%
+                    else %} N/A {% endif %}
                 </td>
                 <td>
                     <div class="btn-group">
-                    <form name="remove_entry" action="/delete" method="POST" novalidate>
-                        <input type="hidden" name="id" value="{{ entry.id }}">
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                    <a href="{{ entry.link }}" class="btn {% if not entry.link %}disabled btn-secondary {% else %}btn-primary{% endif %}">
-                        <i class="bi bi-info-circle"></i>
-                    </a>
+                        <form name="remove_entry" action="/delete" method="POST" novalidate>
+                            <input type="hidden" name="id" value="{{ entry.id }}">
+                            <button type="submit" class="btn btn-danger" title="Delete this entry">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                        <a href="{{ entry.link }}"
+                            class="btn {% if not entry.link %}disabled btn-secondary {% else %}btn-primary{% endif %}"
+                            target="_blank" title="Go to listing">
+                            <i class="bi bi-info-circle"></i>
+                        </a>
                     </div>
                 </td>
             </tr>
@@ -76,6 +90,20 @@
         </tbody>
     </table>
 </div>
+<nav aria-label="Table Navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item {% if history.page == 1 %}disabled{% endif %}"><a
+                href="{{ url_for('history', page=history.prev_num, col_sort=col_sort) }}" class="page-link"
+                tabindex="-1">Previous</a></li>
+        {% for page in history.iter_pages() %}
+        <li class="page-item {% if page == history.page %}active{% endif %}"><a class="page-link"
+                href="{{ url_for('history', page=page, col_sort=col_sort) }}">{{ page }}</a></li>
+        {% endfor %}
+        <li class="page-item {% if history.page == history.pages %}disabled{% endif %}"><a
+                href="{{ url_for('history', page=history.next_num, col_sort=col_sort) }}" class="page-link">Next</a>
+        </li>
+    </ul>
+</nav>
 {% else %}
 <div class="my-5">
     <p class="text-muted text-center h4">No past records found. Go <a href="/predict">make</a> some history!</p>
