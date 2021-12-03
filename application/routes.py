@@ -151,9 +151,8 @@ def history():
     per_page = int(request.args.get("per_page", 5))
     col_sort = request.args.get("col_sort", "created")
     desc = request.args.get("dir", "desc") == "desc"
-    print(desc)
     history = get_history(session["user_id"], page, per_page, col_sort, desc)
-    return render_template("history.html", title="Rentier | History", history=history, col_sort=col_sort, desc=desc)
+    return render_template("history.html", title="Rentier | History", history=history, col_sort=col_sort, desc=desc, per_page=per_page)
 
 
 @app.route("/delete", methods=["POST"])

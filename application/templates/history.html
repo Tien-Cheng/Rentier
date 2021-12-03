@@ -7,28 +7,49 @@
         between different listings.</p>
 </div>
 {% if history.pages > 0 %}
-<div class="dropdown text-end">
-    <button class="btn btn-primary dropdown-toggle" type="button" id="history-sort-toggle" data-bs-toggle="dropdown"
-        aria-expanded="false">
-        Sort by
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="history-sort-toggle">
-        {% for column in history.query.statement.selected_columns.keys()|sort %}
-        {% if column not in ["user_id", "id"] %}
-        <li>
-            <a class="dropdown-item {% if column == col_sort %}active{% endif %}"
-                href="{{ url_for('history', page=history.page, col_sort=column, dir='asc' if column == col_sort and desc else 'desc') }}">
-                {{ column | replace("_", " ")|title }}
-                {% if (desc and column == col_sort) or (column != col_sort) %}
-                &#8595;
-                {% else %}
-                &#8593;
+<div class="text-end">
+    <div class="btn-group me-2" role="group">
+        <div class="dropdown text-end me-2">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="history-entries-toggle"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Entries per page
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="history-entries-toggle">
+                {% for entries in (5, 10, 20, 40) %}
+                <li>
+                    <a class="dropdown-item {% if per_page == entries %}active{% endif %}"
+                        href="{{ url_for('history', page=1, col_sort=col_sort, dir='desc' if desc else 'asc', per_page=entries) }}">
+                        {{ entries }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="dropdown text-end">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="history-sort-toggle"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Sort by
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="history-sort-toggle">
+                {% for column in history.query.statement.selected_columns.keys()|sort %}
+                {% if column not in ["user_id", "id"] %}
+                <li>
+                    <a class="dropdown-item {% if column == col_sort %}active{% endif %}"
+                        href="{{ url_for('history', page=history.page, col_sort=column, dir='asc' if column == col_sort and desc else 'desc') }}">
+                        {{ column | replace("_", " ")|title }}
+                        {% if (desc and column == col_sort) or (column != col_sort) %}
+                        &#8595;
+                        {% else %}
+                        &#8593;
+                        {% endif %}
+                    </a>
+                </li>
                 {% endif %}
-            </a>
-        </li>
-        {% endif %}
-        {% endfor %}
-    </ul>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
 </div>
 <div class="table-responsive my-2">
     <table class="table table-hover text-center">
@@ -93,14 +114,16 @@
 <nav aria-label="Table Navigation">
     <ul class="pagination justify-content-center">
         <li class="page-item {% if history.page == 1 %}disabled{% endif %}"><a
-                href="{{ url_for('history', page=history.prev_num, col_sort=col_sort) }}" class="page-link"
-                tabindex="-1">Previous</a></li>
+                href="{{ url_for('history', page=history.prev_num, col_sort=col_sort, dir='desc' if desc else 'asc', per_page=per_page) }}"
+                class="page-link" tabindex="-1">Previous</a></li>
         {% for page in history.iter_pages() %}
         <li class="page-item {% if page == history.page %}active{% endif %}"><a class="page-link"
-                href="{{ url_for('history', page=page, col_sort=col_sort) }}">{{ page }}</a></li>
+                href="{{ url_for('history', page=page, col_sort=col_sort, dir='desc' if desc else 'asc', per_page=per_page) }}">{{
+                page }}</a></li>
         {% endfor %}
         <li class="page-item {% if history.page == history.pages %}disabled{% endif %}"><a
-                href="{{ url_for('history', page=history.next_num, col_sort=col_sort) }}" class="page-link">Next</a>
+                href="{{ url_for('history', page=history.next_num, col_sort=col_sort, dir='desc' if desc else 'asc', per_page=per_page) }}"
+                class="page-link">Next</a>
         </li>
     </ul>
 </nav>
