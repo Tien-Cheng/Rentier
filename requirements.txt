@@ -23,7 +23,6 @@ Pillow==8.4.0
 platformdirs==2.4.0
 pyparsing==3.0.6
 python-dateutil==2.8.2
-python-dotenv==0.19.1
 regex==2021.11.2
 scikit-learn==1.0.1
 scipy==1.7.2

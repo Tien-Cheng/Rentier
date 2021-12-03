@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-
+from application import NEIGHBORHOODS, ROOM_TYPES
 from wtforms import BooleanField, SelectField, SubmitField, PasswordField, FloatField, IntegerField
 
 from wtforms.fields.html5 import URLField, EmailField
@@ -11,7 +11,8 @@ from wtforms.validators import (
     URL,
     Email,
     Regexp,
-    EqualTo
+    EqualTo,
+    ValidationError
 )
 
 password_validator = Regexp(
@@ -40,60 +41,13 @@ class Prediction(FlaskForm):
     room_type = SelectField(
         "Room Type",
         validators=[InputRequired()],
-        choices=sorted(["Private room", "Entire home/apt", "Shared room"]),
+        choices=ROOM_TYPES,
     )
 
     neighborhood = SelectField(
         "Neighborhood",
         validators=[InputRequired()],
-        choices=sorted(
-            [
-                "Bukit Timah",
-                "Tampines",
-                "Bukit Merah",
-                "Queenstown",
-                "Newton",
-                "Geylang",
-                "River Valley",
-                "Serangoon",
-                "Jurong West",
-                "Rochor",
-                "Downtown Core",
-                "Marine Parade",
-                "Outram",
-                "Bedok",
-                "Kallang",
-                "Novena",
-                "Tanglin",
-                "Pasir Ris",
-                "Ang Mo Kio",
-                "Bukit Batok",
-                "Choa Chu Kang",
-                "Hougang",
-                "Woodlands",
-                "Singapore River",
-                "Jurong East",
-                "Orchard",
-                "Museum",
-                "Toa Payoh",
-                "Bukit Panjang",
-                "Sembawang",
-                "Bishan",
-                "Yishun",
-                "Sengkang",
-                "Punggol",
-                "Clementi",
-                "Mandai",
-                "Western Water Catchment",
-                "Southern Islands",
-                "Tuas",
-                "Sungei Kadut",
-                "Pioneer",
-                "Central Water Catchment",
-                "Marina South",
-                "Lim Chu Kang",
-            ]
-        ),
+        choices=NEIGHBORHOODS,
     )
 
     wifi = BooleanField("Wifi", default=True)
@@ -109,6 +63,9 @@ class Prediction(FlaskForm):
 
     submit = SubmitField("Submit")
 
+    def validate_accomodates(form, field):
+        if field.data < form.beds.data:
+            raise ValidationError("Accomodates should be greater than or equal to the number of beds")
 
 class Login(FlaskForm):
     email = EmailField("Email address", validators=[InputRequired(), Email()])
