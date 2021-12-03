@@ -106,7 +106,7 @@ def predict():
             results = {"price": result[0], "actual_price": actual_price}
             difference = None
             if actual_price is not None:
-                difference = actual_price - result[0]
+                difference = float(actual_price - result[0])
                 results["price_diff"] = abs(difference)
                 results["same"] = (
                     results["price_diff"] < 0.05
@@ -126,7 +126,7 @@ def predict():
                 prediction=float(result[0]),
                 created=dt.utcnow(),
                 user_id=session["user_id"],
-                difference=float(difference)
+                difference=difference
             )
             add_entry(new_entry)
     except BadRequest:
