@@ -18,6 +18,7 @@
     <div class="mb-3">
         {{ form.password.label(class_='form-label') }}
         {{ form.password(class_='form-control')}}
+        <span class="form-text">Passwords should be at least 8 characters long, containing at least one uppercase, lowercase, number and special character.</span>
         {% for error in form.password.errors %}
         <span class="text-danger">{{ error }}</span>
         {% endfor %}
