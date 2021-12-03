@@ -42,4 +42,9 @@ def populate_users():
 @pytest.fixture
 def client(app):
     print(app.static_url_path)
-    return app.test_client()
+    yield app.test_client()
+
+@pytest.fixture
+def fake_login(client):
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1
