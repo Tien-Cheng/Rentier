@@ -28,6 +28,7 @@ class Entry(db.Model):
     actual_price = db.Column(db.Float, nullable=True)
     link = db.Column(db.String(500), nullable=True)
     prediction = db.Column(db.Float, nullable=False)
+    difference = db.Column(db.Float, nullable=True)
     created = db.Column(db.DateTime, nullable=False)
 
     @validates("beds")
@@ -101,8 +102,8 @@ class Entry(db.Model):
         }, "Either actual price should be None, int or float"
         if actual_price is not None:
             assert (
-                actual_price >= 0
-            ), "Actual price should be greater than or equal to 0"
+                actual_price > 0
+            ), "Actual price should be greater than 0"
         return actual_price
 
     @validates("prediction")
@@ -121,6 +122,10 @@ class Entry(db.Model):
         assert type(link) in {type(None), str}, "Link should be None or Str"
         return link
 
+    @validates("difference")
+    def validates_difference(self, key, difference):
+        assert type(difference) in {int, float, type(None)}, "Difference should be a number or None"
+        return difference
 
 def add_entry(entry):
     try:

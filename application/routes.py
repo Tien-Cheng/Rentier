@@ -83,6 +83,9 @@ def predict():
                 assert type(wifi) is bool, "Wifi must be a boolean"
                 assert type(elevator) is bool, "Elevator must be a boolean"
                 assert type(pool) is bool, "Pool must be a boolean"
+                assert type(actual_price) in {type(None), float, int}, "Actual price should be a number or None"
+                if actual_price is not None:
+                    assert actual_price > 0, "Actual price should be greater than 0"
             except:
                 raise BadRequest
             entry_params = pd.DataFrame(
@@ -101,8 +104,10 @@ def predict():
             result = ai_model.predict(entry_params)
             show_result = True
             results = {"price": result[0], "actual_price": actual_price}
+            difference = None
             if actual_price is not None:
-                results["price_diff"] = abs(actual_price - result[0])
+                difference = actual_price - result[0]
+                results["price_diff"] = abs(difference)
                 results["same"] = (
                     results["price_diff"] < 0.05
                 )  # account for floating point inprecision
@@ -121,6 +126,7 @@ def predict():
                 prediction=float(result[0]),
                 created=dt.utcnow(),
                 user_id=session["user_id"],
+                difference=float(difference)
             )
             add_entry(new_entry)
     except BadRequest:
@@ -320,6 +326,7 @@ def api_predict():  # TODO: Implement input validation
         wifi = data["wifi"]
         elevator = data["elevator"]
         pool = data["pool"]
+        actual_price = data["actual_price"]
         assert beds >= 0, "Beds must be greater than or equal to zero"
         assert bathrooms >= 0, "Bathrooms must be greater than or equal to zero"
         assert accomodates >= 0, "Accomodates must be greater than zero"
@@ -330,6 +337,9 @@ def api_predict():  # TODO: Implement input validation
         assert type(wifi) is bool, "Wifi must be a boolean"
         assert type(elevator) is bool, "Elevator must be a boolean"
         assert type(pool) is bool, "Pool must be a boolean"
+        assert type(actual_price) in {type(None), float, int}, "Actual price should be a number or None"
+        if actual_price is not None:
+            assert actual_price > 0, "Actual price should be greater than 0"
     except Exception as e:
         raise API_Error(' '.join(e.args), 400)
 
@@ -347,7 +357,11 @@ def api_predict():  # TODO: Implement input validation
         }
     )
     result = ai_model.predict(X)
-    return jsonify({"prediction": result[0]})
+    if actual_price is not None:
+        difference = actual_price - result[0]
+    else:
+        difference = None
+    return jsonify({"prediction": result[0], "difference" : difference })
 
 
 @app.route("/api/history/<int:id>", methods=["POST"])
@@ -370,6 +384,7 @@ def api_add_history(id):
     actual_price = data["actual_price"]
     link = data["link"]
     prediction = data["prediction"]
+    difference = data["difference"]
     try:
         new_entry = Entry(
                 beds=beds,
@@ -386,11 +401,11 @@ def api_add_history(id):
                 prediction=float(prediction),
                 created=dt.utcnow(),
                 user_id=id,
+                difference=difference
             )
+        result = add_entry(new_entry)
     except Exception as e:
         raise API_Error(' '.join(e.args), 400)
-
-    result = add_entry(new_entry)
     return jsonify({"result": result})
 
 AssertionError()
@@ -416,7 +431,8 @@ def api_get_user_history(id):
            "actual_price" : entry.actual_price,
            "link" : entry.link,
            "prediction" : entry.prediction,
-           "created" : entry.created
+           "created" : entry.created,
+           "difference" : entry.difference,
         } for entry in entries
     ]
     return jsonify(result)
