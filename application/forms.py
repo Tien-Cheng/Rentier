@@ -56,7 +56,7 @@ class Prediction(FlaskForm):
     pool = BooleanField("Pool?", default=False)
 
     actual_price = FloatField(
-        "Actual Listing Price (Optional)", validators=[Optional(), NumberRange(min=0)]
+        "Actual Listing Price in SGD (Optional)", validators=[Optional(), NumberRange(min=0)]
     )
 
     link = URLField("Link to Listing (Optional)", validators=[Optional(), URL()])
