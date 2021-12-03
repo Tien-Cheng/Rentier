@@ -55,7 +55,7 @@
     <table class="table table-hover text-center">
         <thead class="table-dark">
             <tr>
-                <!-- <th scope="col">#</th> -->
+                <th scope="col">#</th>
                 <th scope="col">Created</th>
                 <th scope="col">Beds</th>
                 <th scope="col">Bathrooms</th>
@@ -75,6 +75,7 @@
         <tbody>
             {% for entry in history.items %}
             <tr>
+                <td>{{ loop.index }}</td>
                 <td>{{ entry.created | render_date(format="%d/%m/%Y %H:%M") }}</td>
                 <td>{{ entry.beds }}</td>
                 <td>{{ entry.bathrooms }}</td>
