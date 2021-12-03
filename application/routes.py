@@ -19,8 +19,8 @@ from flask import (
 )
 from application.forms import Prediction, Login, Register
 from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.exceptions import HTTPException, BadRequest, InternalServerError
-from application.utils import login_required
+from werkzeug.exceptions import BadRequest, InternalServerError
+from application.utils import login_required, API_Error
 from datetime import datetime as dt
 import pandas as pd
 
@@ -34,7 +34,11 @@ def error_handler(error):
         error.name = "Internal Server Error"
     return render_template("error.html", error=error, title=f"Rentier | {error.name}"), error.code
 
-
+@app.errorhandler(API_Error)
+def api_error_handler(error):
+    return jsonify({
+        "message" : error.message
+    }), error.status_code
 
 @app.route("/", methods=["GET"])
 def index():
@@ -138,7 +142,7 @@ def delete():
     user_id = session["user_id"]
     result = db.session.query(Entry).filter_by(id=id, user_id=user_id).first()
     if result is None:
-        abort(403, description="You do not have permission to delete this entry!")
+        abort(404, description="We could not find this entry in your history")
     else:
         delete_entry(result)
     return redirect(url_for("history"))
@@ -221,19 +225,22 @@ def api_add_user():
     """
     Api for adding new users
     """
-    # Get json file posted from client
-    data = request.get_json()
+    try:
+        # Get json file posted from client
+        data = request.get_json()
+        if data is None:
+            raise TypeError("Invalid request type. Ensure data is in the form of a json file.")
+        # Retrieve fields from data
+        email = data["email"]
+        password_hash = generate_password_hash(data["password"])
+        created = dt.utcnow()
+        # Create a new entry into user table
+        new_user = User(email=email, password_hash=password_hash, created=created)
 
-    # Retrieve fields from data
-    email = data["email"]
-    password_hash = generate_password_hash(data["password"])
-    created = dt.utcnow()
-    # Create a new entry into user table
-    new_user = User(email=email, password_hash=password_hash, created=created)
-
-    # Add entry to user table
-    result = add_user(new_user)
-
+        # Add entry to user table
+        result = add_user(new_user)
+    except Exception as e:
+        raise API_Error(' '.join(e.args), 400)
     return jsonify(
         {
             "id": result,
@@ -250,16 +257,17 @@ def api_login_user():
     Api for logging in new user
     """
     data = request.get_json()
+    if data is None:
+        raise TypeError("Invalid request type. Ensure data is in the form of a json file.")
     email = data["email"]
     password = data["password"]
     remember_me = data["remember_me"]
     rows = db.session.query(User).filter_by(email=email).all()
     if len(rows) == 0:
-        abort(400)
+        raise API_Error("User not found", 404)
     if not check_password_hash(rows[0].password_hash, password):
-        abort(400)
+        raise API_Error("Wrong password", 403)
     session["user_id"] = rows[0].id
-    flash(f"Logged In", "success")
     if remember_me:
         session.permanent = True
     else:
@@ -281,27 +289,31 @@ def api_predict():  # TODO: Implement input validation
     """
     Api for requesting and returning user predictions based on user input
     """
-    data = request.get_json()
-    beds = int(data["beds"])
-    bathrooms = float(data["bathrooms"])
-    accomodates = int(data["accomodates"])
-    minimum_nights = data["minimum_nights"]
-    room_type = data["room_type"]
-    neighborhood = data["neighborhood"]
-    wifi = data["wifi"]
-    elevator = data["elevator"]
-    pool = data["pool"]
-    assert beds >= 0, "Beds must be greater than or equal to zero"
-    assert bathrooms >= 0, "Bathrooms must be greater than or equal to zero"
-    assert accomodates >= 0, "Accomodates must be greater than zero"
-    assert accomodates >= beds, "Accomodates must be greater than or equal to number of beds"
-    assert minimum_nights >= 0, "MinimumNights must be greater than or equal to zero"
-    assert room_type in ROOM_TYPES, "Room type is invalid"
-    assert neighborhood in NEIGHBORHOODS, "Neighborhood is invalid"
-    assert type(wifi) is bool, "Wifi must be a boolean"
-    assert type(elevator) is bool, "Elevator must be a boolean"
-    assert type(pool) is bool, "Pool must be a boolean"
-
+    try:
+        data = request.get_json()
+        if data is None:
+            raise TypeError("Invalid request type. Ensure data is in the form of a json file.")
+        beds = int(data["beds"])
+        bathrooms = float(data["bathrooms"])
+        accomodates = int(data["accomodates"])
+        minimum_nights = data["minimum_nights"]
+        room_type = data["room_type"]
+        neighborhood = data["neighborhood"]
+        wifi = data["wifi"]
+        elevator = data["elevator"]
+        pool = data["pool"]
+        assert beds >= 0, "Beds must be greater than or equal to zero"
+        assert bathrooms >= 0, "Bathrooms must be greater than or equal to zero"
+        assert accomodates >= 0, "Accomodates must be greater than zero"
+        assert accomodates >= beds, "Accomodates must be greater than or equal to number of beds"
+        assert minimum_nights >= 0, "MinimumNights must be greater than or equal to zero"
+        assert room_type in ROOM_TYPES, "Room type is invalid"
+        assert neighborhood in NEIGHBORHOODS, "Neighborhood is invalid"
+        assert type(wifi) is bool, "Wifi must be a boolean"
+        assert type(elevator) is bool, "Elevator must be a boolean"
+        assert type(pool) is bool, "Pool must be a boolean"
+    except Exception as e:
+        raise API_Error(' '.join(e.args), 400)
 
     X = pd.DataFrame(
         {
@@ -324,8 +336,10 @@ def api_predict():  # TODO: Implement input validation
 @login_required
 def api_add_history(id):
     if session["user_id"] != id:
-        abort(403)
+        raise API_Error("Your user id does not match up with the request.", 403)
     data = request.get_json()
+    if data is None:
+        raise TypeError("Invalid request type. Ensure data is in the form of a json file.")
     beds = data["beds"]
     bathrooms = data["bathrooms"]
     accomodates = data["accomodates"]
@@ -338,33 +352,36 @@ def api_add_history(id):
     actual_price = data["actual_price"]
     link = data["link"]
     prediction = data["prediction"]
-    new_entry = Entry(
-            beds=beds,
-            bathrooms=bathrooms,
-            accomodates=accomodates,
-            minimum_nights=minimum_nights,
-            room_type=room_type,
-            neighborhood=neighborhood,
-            wifi=wifi,
-            elevator=elevator,
-            pool=pool,
-            actual_price=actual_price,
-            link=link,
-            prediction=float(prediction),
-            created=dt.utcnow(),
-            user_id=id,
-        )
+    try:
+        new_entry = Entry(
+                beds=beds,
+                bathrooms=bathrooms,
+                accomodates=accomodates,
+                minimum_nights=minimum_nights,
+                room_type=room_type,
+                neighborhood=neighborhood,
+                wifi=wifi,
+                elevator=elevator,
+                pool=pool,
+                actual_price=actual_price,
+                link=link,
+                prediction=float(prediction),
+                created=dt.utcnow(),
+                user_id=id,
+            )
+    except Exception as e:
+        raise API_Error(' '.join(e.args), 400)
 
     result = add_entry(new_entry)
     return jsonify({"result": result})
 
-
+AssertionError()
 
 @app.route('/api/history/<int:id>', methods=["GET"])
 @login_required
 def api_get_user_history(id):
     if session["user_id"] != id:
-        abort(403)
+        raise API_Error("Your user id does not match up with the request.", 403)
     entries = get_history(id)
     result = [
         {
@@ -390,10 +407,10 @@ def api_get_user_history(id):
 @login_required
 def api_delete_entry(user_id, id):
     if session["user_id"] != user_id:
-        abort(403)
+        raise API_Error("Your user id does not match up with the request.", 403)
     result = db.session.query(Entry).filter_by(id=id, user_id=user_id).first()
     if result is None:
-        abort(403)
+        raise API_Error("Entry could not be found", 404)
     result = delete_entry(result)
     return jsonify({
         "result" : result
