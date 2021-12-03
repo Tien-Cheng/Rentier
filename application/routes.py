@@ -141,7 +141,9 @@ def history():
     """
     Return history page, containing the specific history of a user
     """
-    history = get_history(session["user_id"])
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 5))
+    history = get_history(session["user_id"], page, per_page)
     return render_template("history.html", title="Rentier | History", history=history)
 
 

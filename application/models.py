@@ -141,9 +141,13 @@ def delete_entry(entry):
         abort(500)
 
 
-def get_history(user_id):
+def get_history(user_id, page=None, per_page=5):
     try:
-        return db.session.query(Entry).filter_by(user_id=user_id).all()
+        results = db.session.query(Entry).filter_by(user_id=user_id)
+        if page is None:
+            return results.all()
+        else:
+            return results.paginate(page=page, per_page=per_page) 
     except Exception as error:
         flash(str(error), "danger")
         abort(500)
