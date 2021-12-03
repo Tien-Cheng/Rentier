@@ -234,4 +234,4 @@ def test_delete_entry(client, entry_ids, capsys):
     }, 2)
 ], indirect=["fake_login"])
 def test_delete_entry_unauthorized(client, entry_ids, capsys):
-    test_delete_entry(client, entrylist, capsys)
+    test_delete_entry(client, entry_ids, capsys)

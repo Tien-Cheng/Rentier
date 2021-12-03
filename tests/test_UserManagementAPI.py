@@ -40,7 +40,7 @@ def test_user_add_api(client, userlist, capsys):
             dt.utcnow() - date
         ).total_seconds() < 5 * 60, "Created date is too far off to be correct"
 
-        # TODO: Decide if I should check the database for the user
+
 
 
 @pytest.mark.usefixtures("populate_users")
@@ -56,18 +56,7 @@ def test_user_add_api(client, userlist, capsys):
 )
 def test_user_add_api_duplicate_email(client, userlist, capsys):
     with capsys.disabled():
-        # Prepare data into dictionary
-        data = {"email": userlist[0], "password": userlist[1]}
-
-        # Send a post request to the api
-        response = client.post(
-            "/api/users", data=json.dumps(data), content_type="application/json"
-        )
-        # response_body = json.loads(response.get_data(as_text=True))
-
-        # Check that it failed
-        # assert response.status_code == 400
-
+        test_user_add_api(client, userlist, capsys)
 
 @pytest.mark.usefixtures("populate_users")
 @pytest.mark.parametrize(

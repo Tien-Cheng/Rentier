@@ -495,5 +495,3 @@ def test_EntryValidation_RangeTest(entrylist, capsys):
 def test_EntryValidationMissing(entrylist, capsys):
     test_EntryClass(entrylist, capsys)
 
-
-# TODO: Consistency Tests: Check that accomodation > #beds

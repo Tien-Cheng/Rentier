@@ -12,7 +12,6 @@ import json
         ("register", 200),
         ("predict", 303),  # Trying to access page when not logged in
         ("api/predict", 405), # Method not allowed
-        # ("api/history/1", )
         ("api/login", 405),
         ("api/users", 405),
         ("logout", 405),
@@ -26,7 +25,7 @@ def test_Route(client, endpoint, capsys):
         assert response.status_code == code
 
 
-@pytest.mark.parametrize("endpoint", [("history", 200), ("predict", 200)])
+@pytest.mark.parametrize("endpoint", [("history", 200), ("predict", 200), ("api/history/1", 200)])
 @pytest.mark.usefixtures("fake_login")
 def test_Route_Authorized(client, endpoint, capsys):
     test_Route(client, endpoint, capsys)
