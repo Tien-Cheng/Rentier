@@ -72,6 +72,19 @@ def predict():
             pool = pred_form.pool.data
             actual_price = pred_form.actual_price.data
             link = pred_form.link.data  # store link for history
+            try:
+                assert beds >= 0, "Beds must be greater than or equal to zero"
+                assert bathrooms >= 0, "Bathrooms must be greater than or equal to zero"
+                assert accomodates >= 0, "Accomodates must be greater than zero"
+                assert accomodates >= beds, "Accomodates must be greater than or equal to number of beds"
+                assert minimum_nights >= 0, "MinimumNights must be greater than or equal to zero"
+                assert room_type in ROOM_TYPES, "Room type is invalid"
+                assert neighborhood in NEIGHBORHOODS, "Neighborhood is invalid"
+                assert type(wifi) is bool, "Wifi must be a boolean"
+                assert type(elevator) is bool, "Elevator must be a boolean"
+                assert type(pool) is bool, "Pool must be a boolean"
+            except:
+                raise BadRequest
             entry_params = pd.DataFrame(
                 {
                     "beds": [beds],

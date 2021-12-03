@@ -11,7 +11,8 @@ from wtforms.validators import (
     URL,
     Email,
     Regexp,
-    EqualTo
+    EqualTo,
+    ValidationError
 )
 
 password_validator = Regexp(
@@ -62,6 +63,9 @@ class Prediction(FlaskForm):
 
     submit = SubmitField("Submit")
 
+    def validate_accomodates(form, field):
+        if field.data < form.beds.data:
+            raise ValidationError("Accomodates should be greater than or equal to the number of beds")
 
 class Login(FlaskForm):
     email = EmailField("Email address", validators=[InputRequired(), Email()])
