@@ -11,6 +11,11 @@ import json
         ("login", 200),
         ("register", 200),
         ("predict", 303),  # Trying to access page when not logged in
+        ("api/predict", 405), # Method not allowed
+        # ("api/history/1", )
+        ("api/login", 405),
+        ("api/users", 405),
+        ("logout", 405),
     ],
 )
 def test_Route(client, endpoint, capsys):
@@ -27,7 +32,3 @@ def test_Route_Authorized(client, endpoint, capsys):
     test_Route(client, endpoint, capsys)
     with client.session_transaction() as sess:
         sess.pop("user_id", None)  # logout
-
-@pytest.mark.parametrize("endpoint", [
-    ("api/history/1")
-])
