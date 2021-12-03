@@ -13,7 +13,7 @@
         Sort by
     </button>
     <ul class="dropdown-menu" aria-labelledby="history-sort-toggle">
-        {% for column in history.query.statement.columns.keys() %}
+        {% for column in history.query.statement.selected_columns.keys() %}
         {% if column not in ["user_id", "id"] %}
         <li>
             <a class="dropdown-item {% if column == col_sort %}active{% endif %}"
