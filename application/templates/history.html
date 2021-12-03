@@ -13,17 +13,17 @@
         Sort by
     </button>
     <ul class="dropdown-menu" aria-labelledby="history-sort-toggle">
-        {% for column in history.query.statement.selected_columns.keys() %}
+        {% for column in history.query.statement.selected_columns.keys()|sort %}
         {% if column not in ["user_id", "id"] %}
         <li>
             <a class="dropdown-item {% if column == col_sort %}active{% endif %}"
                 href="{{ url_for('history', page=history.page, col_sort=column, dir='asc' if column == col_sort and desc else 'desc') }}">
                 {{ column | replace("_", " ")|title }}
-                {% if  (desc and column == col_sort) or (column != col_sort)  %}
-                        &#8595;
-                    {% else %}
-                        &#8593;
-                    {% endif %}
+                {% if (desc and column == col_sort) or (column != col_sort) %}
+                &#8595;
+                {% else %}
+                &#8593;
+                {% endif %}
             </a>
         </li>
         {% endif %}
@@ -67,7 +67,7 @@
                 <td>${{ entry.prediction | round(precision=2) }}</td>
                 <td>{% if entry.actual_price %} ${{ entry.actual_price | round(precision=2) }} {% else %} N/A {% endif
                     %}</td>
-                <td>{% if entry.actual_price %} {{ (entry.actual_price - entry.prediction) | round(precision=2) }} {%
+                <td>{% if entry.difference %} {{ entry.difference|round(precision=2) }} {%
                     else %} N/A {% endif %}
                 </td>
                 <td>
