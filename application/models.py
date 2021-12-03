@@ -36,7 +36,6 @@ class Entry(db.Model):
         assert (
             beds >= 0
         ), "Beds should be greater than or equal to 0 (some AirBNB listings have no beds)"
-        # TODO: Consider putting upper bound on parameters
         return beds
 
     @validates("bathrooms")
@@ -121,9 +120,6 @@ class Entry(db.Model):
     def validates_link(self, key, link):
         assert type(link) in {type(None), str}, "Link should be None or Str"
         return link
-
-
-# TODO: Standarize, then have specific exceptions like integrity error be handled in routes
 
 
 def add_entry(entry):
