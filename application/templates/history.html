@@ -6,7 +6,7 @@
     <p class="lead col-lg-6 col-sm-12 text-justify">We keep track of your past submissions to help you make a comparison
         between different listings.</p>
 </div>
-{% if history %}
+{% if history.pages > 0 %}
 <div class="dropdown text-end">
     <button class="btn btn-primary dropdown-toggle" type="button" id="history-sort-toggle" data-bs-toggle="dropdown"
         aria-expanded="false">
@@ -45,9 +45,9 @@
                 <th scope="col">Wifi?</th>
                 <th scope="col">Elevator?</th>
                 <th scope="col">Pool?</th>
-                <th scope="col">Predicted (USD)</th>
-                <th scope="col">Actual (USD)</th>
-                <th scope="col">Difference (USD)</th>
+                <th scope="col">Predicted (SGD)</th>
+                <th scope="col">Actual (SGD)</th>
+                <th scope="col">Difference (SGD)</th>
                 <th scope="col">Actions</th>
             </tr>
         </thead>

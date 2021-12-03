@@ -101,7 +101,7 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title fw-bold">The predicted rental fee is...</h5>
-                <p class="card-text text-center fs-5">${{price | default(0)|round(precision=2) }} per night
+                <p class="card-text text-center fs-5">SGD {{price | default(0)|round(precision=2) }} per night
                     {% if actual_price %}
                     which is
                     {% if same %}
