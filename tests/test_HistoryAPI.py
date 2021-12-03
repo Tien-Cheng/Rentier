@@ -24,6 +24,7 @@ from application import app
             178,  # Actual price
             "https://www.airbnb.com/rooms/71609",  # Link to listing
             155.06,  # Predicted
+            178 - 155.06
         ], 2),
         ([
             1,  # User ID
@@ -39,6 +40,7 @@ from application import app
             None,  # Actual price
             None,  # Link to listing
             95.09,  # Predicted
+            None
         ], 1), 
     ], indirect=["fake_login"])
 def test_add_entry(client, entrylist, capsys):
@@ -57,6 +59,7 @@ def test_add_entry(client, entrylist, capsys):
                 actual_price=entrylist[10],
                 link=entrylist[11],
                 prediction=entrylist[12],
+                difference =entrylist[13],
             )
 
             response = client.post(
@@ -97,6 +100,7 @@ def test_add_entry(client, entrylist, capsys):
             None,  # Actual Price
             None,  # Link
             94.0,  # Prediction
+            None
         ], -1),
         ([
             545,
@@ -112,6 +116,7 @@ def test_add_entry(client, entrylist, capsys):
             80,
             "https://www.airbnb.com/rooms/71896",
             70.83,
+            80 - 70.83,
         ], 545),
     ], indirect=["fake_login"]
 )
@@ -143,6 +148,7 @@ def test_add_entry_invalid_user_id(client, entrylist, capsys):
                     "actual_price": 178,
                     "link": "https://www.airbnb.com/rooms/71609",
                     "prediction": 155.06,
+                    "difference" : 178 - 155.06
                 }
             ],
         }, 2),
@@ -162,6 +168,7 @@ def test_add_entry_invalid_user_id(client, entrylist, capsys):
                     "actual_price": None,
                     "link": None,
                     "prediction": 95.09,
+                    "difference" : None
                 }
             ],
         }, 1),
