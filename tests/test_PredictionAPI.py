@@ -2,6 +2,7 @@ import pytest
 import json
 
 
+@pytest.mark.usefixtures("fake_login")
 @pytest.mark.parametrize(
     "entrylist",
     [
@@ -46,7 +47,7 @@ def test_predict_api(client, entrylist, capsys):
             "elevator": entrylist[7],
             "pool": entrylist[8],
         }
-
+        
         response = client.post(
             "/api/predict", data=json.dumps(data), content_type="application/json"
         )
@@ -58,17 +59,18 @@ def test_predict_api(client, entrylist, capsys):
         # Check that prediction result is reasonable
         pred = float(response_body["prediction"])
         assert pred > 0, "Predicted value should be greater than 0"
-        assert (
-            abs(float(entrylist[-2]) - pred) < 36
-        ), "Prediction value is likely to be invalid"
+        if len(entrylist) == 11:
+            assert (
+                abs(float(entrylist[-2]) - pred) < 36
+            ), "Prediction value is likely to be invalid"
 
 
 @pytest.mark.xfail(reason="Inputs out of range", strict=True)
+@pytest.mark.usefixtures("fake_login")
 @pytest.mark.parametrize(
     "entrylist",
     [
         [
-            1,
             -2,  # Beds Cannot have negative numbers
             1,
             2,
@@ -78,15 +80,12 @@ def test_predict_api(client, entrylist, capsys):
             True,
             True,
             True,
-            80,
-            "https://www.airbnb.com/rooms/71896",  # Test optional
-            70.83,
+            # 80,
+            # "https://www.airbnb.com/rooms/71896",  # Test optional
         ],
         [
-            1,
             2,
             -5,  # Bathrooms Cannot have negative numbers
-            1,
             2,
             90,
             "Private room",
@@ -94,31 +93,25 @@ def test_predict_api(client, entrylist, capsys):
             True,
             True,
             True,
-            80,
-            "https://www.airbnb.com/rooms/71896",  # Test optional
-            70.83,
+            # 80,
+            # "https://www.airbnb.com/rooms/71896",  # Test optional
         ],
         [
-            1,
             2,
             5,
             0,  # Accomodates cannot be zero
-            2,
             90,
             "Private room",
             "Bukit Timah",
             True,
             True,
             True,
-            80,
-            "https://www.airbnb.com/rooms/71896",  # Test optional
-            70.83,
+            # 80,
+            # "https://www.airbnb.com/rooms/71896",  # Test optional
         ],
         [
-            1,
             2,
             5,
-            1,
             2,
             -42,  # minimum_nights Cannot have negative numbers
             "Private room",
@@ -126,15 +119,12 @@ def test_predict_api(client, entrylist, capsys):
             True,
             True,
             True,
-            80,
-            "https://www.airbnb.com/rooms/71896",  # Test optional
-            70.83,
+            # 80,
+            # "https://www.airbnb.com/rooms/71896",  # Test optional
         ],
         [
-            1,
             2,
             5,
-            1,
             2,
             90,
             "Filet O Fish",  # Invalid room type
@@ -142,15 +132,12 @@ def test_predict_api(client, entrylist, capsys):
             True,
             True,
             True,
-            80,
-            "https://www.airbnb.com/rooms/71896",  # Test optional
-            70.83,
+            # 80,
+            # "https://www.airbnb.com/rooms/71896",  # Test optional
         ],
         [
-            1,
             2,
             5,
-            1,
             2,
             90,
             "Private room",
@@ -158,25 +145,8 @@ def test_predict_api(client, entrylist, capsys):
             True,
             True,
             True,
-            80,
-            "https://www.airbnb.com/rooms/71896",
-            70.83,
-        ],
-        [
-            1,
-            2,
-            5,
-            1,
-            2,
-            90,
-            "Private room",
-            "Bukit Timah",
-            True,
-            True,
-            True,
-            -100,  # Actual price cannot be negative
-            "https://www.airbnb.com/rooms/71896",
-            70.83,
+            # 80,
+            # "https://www.airbnb.com/rooms/71896",
         ],
     ],
 )

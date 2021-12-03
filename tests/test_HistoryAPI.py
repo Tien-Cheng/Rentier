@@ -6,10 +6,11 @@ from application import app
 
 # Test that adding normal entries to history works correctly
 @pytest.mark.usefixtures("populate_users")
+@pytest.mark.usefixtures("fake_login")
 @pytest.mark.parametrize(
-    "entrylist",
+    "entrylist, fake_login",
     [
-        [
+        ([
             2,  # User ID
             3,  # Beds
             1,  # Bathrooms
@@ -23,8 +24,8 @@ from application import app
             178,  # Actual price
             "https://www.airbnb.com/rooms/71609",  # Link to listing
             155.06,  # Predicted
-        ],
-        [
+        ], 2),
+        ([
             1,  # User ID
             2,  # Beds
             1,  # Bathrooms
@@ -38,37 +39,37 @@ from application import app
             None,  # Actual price
             None,  # Link to listing
             95.09,  # Predicted
-        ], # TODO: Add more test cases
-    ],
-)
+        ], 1), 
+    ], indirect=["fake_login"])
 def test_add_entry(client, entrylist, capsys):
     with capsys.disabled():
-        data = dict(
-            beds=entrylist[1],
-            bathrooms=entrylist[2],
-            accomodates=entrylist[3],
-            minimum_nights=entrylist[4],
-            room_type=entrylist[5],
-            neighborhood=entrylist[6],
-            wifi=entrylist[7],
-            elevator=entrylist[8],
-            pool=entrylist[9],
-            actual_price=entrylist[10],
-            link=entrylist[11],
-            prediction=entrylist[12],
-        )
+        with client:
+            data = dict(
+                beds=entrylist[1],
+                bathrooms=entrylist[2],
+                accomodates=entrylist[3],
+                minimum_nights=entrylist[4],
+                room_type=entrylist[5],
+                neighborhood=entrylist[6],
+                wifi=entrylist[7],
+                elevator=entrylist[8],
+                pool=entrylist[9],
+                actual_price=entrylist[10],
+                link=entrylist[11],
+                prediction=entrylist[12],
+            )
 
-        response = client.post(
-            f"/api/history/{entrylist[0]}",
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        response_body = json.loads(response.get_data(as_text=True))
+            response = client.post(
+                f"/api/history/{entrylist[0]}",
+                data=json.dumps(data),
+                content_type="application/json",
+            )
+            response_body = json.loads(response.get_data(as_text=True))
 
-        assert response.status_code == 200
-        assert response.headers["Content-Type"] == "application/json"
+            assert response.status_code == 200
+            assert response.headers["Content-Type"] == "application/json"
 
-        assert response_body["result"]
+            assert response_body["result"]
 
 
 # Test that adding entries with invalid user_id results in failure
@@ -78,10 +79,11 @@ def test_add_entry(client, entrylist, capsys):
 )
 @pytest.mark.usefixtures("populate_users")
 @pytest.mark.xfail(reason="User ID does not exist", strict=True)
+@pytest.mark.usefixtures("fake_login")
 @pytest.mark.parametrize(
-    "entrylist",
+    "entrylist, fake_login",
     [
-        [
+        ([
             -1,  # User_id
             2,  # Beds
             1,  # Bathrooms
@@ -95,8 +97,8 @@ def test_add_entry(client, entrylist, capsys):
             None,  # Actual Price
             None,  # Link
             94.0,  # Prediction
-        ],
-        [
+        ], -1),
+        ([
             545,
             1,
             1,
@@ -110,8 +112,8 @@ def test_add_entry(client, entrylist, capsys):
             80,
             "https://www.airbnb.com/rooms/71896",
             70.83,
-        ],
-    ],
+        ], 545),
+    ], indirect=["fake_login"]
 )
 def test_add_entry_invalid_user_id(client, entrylist, capsys):
     test_add_entry(client, entrylist, capsys)
@@ -121,10 +123,11 @@ def test_add_entry_invalid_user_id(client, entrylist, capsys):
 
 
 # Get History
+@pytest.mark.usefixtures("fake_login")
 @pytest.mark.parametrize(
-    "user_history",
+    "user_history, fake_login",
     [
-        {
+        ({
             "user_id": 2,
             "history": [
                 {
@@ -142,8 +145,8 @@ def test_add_entry_invalid_user_id(client, entrylist, capsys):
                     "prediction": 155.06,
                 }
             ],
-        },
-        {
+        }, 2),
+        ({
             "user_id": 1,
             "history": [
                 {
@@ -161,70 +164,74 @@ def test_add_entry_invalid_user_id(client, entrylist, capsys):
                     "prediction": 95.09,
                 }
             ],
-        },
-    ],
+        }, 1),
+    ], indirect=["fake_login"]
 )
 def test_get_user_history(client, user_history, capsys):
     with capsys.disabled():
-        user_id = user_history["user_id"]
-        response = client.get(f"/api/history/{user_id}")
-        response_body = json.loads(response.get_data(as_text=True))
+        with client:
+            user_id = user_history["user_id"]
+            response = client.get(f"/api/history/{user_id}")
+            response_body = json.loads(response.get_data(as_text=True))
 
-        assert response.status_code == 200
-        assert response.headers["Content-Type"] == "application/json"
-        for entry, expected in zip(response_body, user_history["history"]):
-            for key in (
-                "beds",
-                "bathrooms",
-                "accomodates",
-                "minimum_nights",
-                "room_type",
-                "neighborhood",
-                "wifi",
-                "elevator",
-                "pool",
-                "actual_price",
-                "link",
-                "prediction",
-            ):
-                assert entry[key] == expected[key]
+            assert response.status_code == 200
+            assert response.headers["Content-Type"] == "application/json"
+            for entry, expected in zip(response_body, user_history["history"]):
+                for key in (
+                    "beds",
+                    "bathrooms",
+                    "accomodates",
+                    "minimum_nights",
+                    "room_type",
+                    "neighborhood",
+                    "wifi",
+                    "elevator",
+                    "pool",
+                    "actual_price",
+                    "link",
+                    "prediction",
+                ):
+                    assert entry[key] == expected[key]
 
 
 # Remove Entry
-@pytest.mark.parametrize("entry_ids", [
-    {
+@pytest.mark.usefixtures("fake_login")
+@pytest.mark.parametrize("entry_ids, fake_login", [
+    ({
         "user_id" : 1,
         "id" : 2
-    },
-    {
+    }, 1),
+    ({
         "user_id" : 2,
         "id" : 1
-    }
-])
+    }, 2)
+], indirect=["fake_login"])
 def test_delete_entry(client, entry_ids, capsys):
     with capsys.disabled():
-        user_id = entry_ids["user_id"]
-        entry_id = entry_ids["id"]
-        response = client.delete(f"/api/history/{user_id}/{entry_id}/")
-        response_body = json.loads(response.get_data(as_text=True))
+        with client:
+            user_id = entry_ids["user_id"]
+            entry_id = entry_ids["id"]
+            response = client.delete(f"/api/history/{user_id}/{entry_id}/")
+            response_body = json.loads(response.get_data(as_text=True))
 
-        assert response.status_code == 200
-        assert response.headers["Content-Type"] == "application/json"
+            assert response.status_code == 200
+            assert response.headers["Content-Type"] == "application/json"
 
-        assert response_body["result"] == entry_id
+            assert response_body["result"] == entry_id
 
 
 ## Expected Failure: Deleting an entry not related to the user
 @pytest.mark.xfail(reason="Entry does not belong to the user", strict=True)
-@pytest.mark.parametrize("entry_ids", [
-    {
+@pytest.mark.usefixtures("fake_login")
+@pytest.mark.parametrize("entry_ids, fake_login", [
+    ({
         "user_id" : 1,
         "id" : 2
-    },
-    {
+    }, 1),
+    ({
         "user_id" : 2,
         "id" : 1
-    }
-])
+    }, 2)
+], indirect=["fake_login"])
 def test_delete_entry_unauthorized(client, entry_ids, capsys):
-    raise NotImplementedError
+    test_delete_entry(client, entrylist, capsys)

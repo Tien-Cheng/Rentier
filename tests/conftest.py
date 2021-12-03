@@ -45,6 +45,9 @@ def client(app):
     yield app.test_client()
 
 @pytest.fixture
-def fake_login(client):
+def fake_login(client, request):
     with client.session_transaction() as sess:
-        sess["user_id"] = 1
+        try:
+            sess["user_id"] = request.param
+        except:
+            sess["user_id"] = 1

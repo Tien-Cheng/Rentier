@@ -101,6 +101,7 @@ def test_user_login_api(client, userlist, capsys):
 
 
 @pytest.mark.usefixtures("fake_login")
+@pytest.mark.parametrize("fake_login", [1], indirect=True)
 def test_user_logout(client, capsys):
     with capsys.disabled():
         with client:
